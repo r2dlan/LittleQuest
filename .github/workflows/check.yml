@@ -1,7 +1,25 @@
 name: Little Quest checks and APK
 on:
   push:
+    paths:
+      - 'web/**'
+      - 'android/**'
+      - 'sync-android.mjs'
+      - 'scripts/build-android.sh'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/check.yml'
+      - '!**/*.md'
   pull_request:
+    paths:
+      - 'web/**'
+      - 'android/**'
+      - 'sync-android.mjs'
+      - 'scripts/build-android.sh'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/check.yml'
+      - '!**/*.md'
   workflow_dispatch:
 concurrency:
   group: android-${{ github.workflow }}-${{ github.ref }}

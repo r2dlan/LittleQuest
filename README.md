@@ -90,7 +90,7 @@ In VS Code die empfohlene Biome-Erweiterung installieren. Die Repository-Einstel
 
 Der Commit-Hook ist in diesem Checkout bereits aktiviert und prüft Biome sowie Tests. In weiteren Checkouts nach `npm ci` einmal `npm run hooks:install` ausführen. Der Hook verändert keine Dateien automatisch.
 
-Der GitHub-Workflow `.github/workflows/check.yml` prüft bei Pushes und Pull Requests Biome, Tests und synchronisierte Android-Assets. Er wird aktiv, sobald diese Dateien auf GitHub gepusht sind. Repository-Regeln zum verpflichtenden Bestehen vor dem Merge sind noch nicht konfiguriert.
+Der GitHub-Workflow `.github/workflows/check.yml` prüft bei Pushes und Pull Requests mit Änderungen an App- oder Builddateien Biome, Tests und synchronisierte Android-Assets. Reine Dokumentationsänderungen starten diesen Workflow nicht. Repository-Regeln zum verpflichtenden Bestehen vor dem Merge sind noch nicht konfiguriert.
 
 `AGENTS.md` verpflichtet auch zukünftige Arbeiten im Repository zu diesen Prüfungen. Generierte Android-Assets und lokale Buildwerkzeuge sind aus Biome ausgeschlossen; die Web-Quelldateien werden geprüft und anschließend synchronisiert.
 
@@ -112,7 +112,7 @@ Codex bereitet am Feature-Ende eine passende Nachricht vor. Commit und Push erfo
 
 ## Android-APK auf GitHub bauen
 
-Der Workflow **Little Quest checks and APK** startet bei Pushes, Pull Requests und manuell über **Actions → Little Quest checks and APK → Run workflow**. Zuerst laufen Biome, Spieltests und die Prüfung der Android-Assets. Nur danach wird mit Java 17, Gradle 8.9 und Android SDK 35 eine installierbare Debug-APK gebaut und ihre Signatur geprüft.
+Der Workflow **Little Quest checks and APK** startet bei Pushes und Pull Requests nur für Änderungen unter `web/` oder `android/`, an `sync-android.mjs`, `scripts/build-android.sh`, `package.json`, `package-lock.json` oder am APK-Workflow selbst. Markdown-Dateien sind ausgeschlossen. Änderungen ausschließlich an Dokumentation, Agent-Anweisungen oder Renovate starten keinen APK-Build. Manuell lässt er sich weiterhin über **Actions → Little Quest checks and APK → Run workflow** starten. Zuerst laufen Biome, Spieltests und die Prüfung der Android-Assets. Nur danach wird mit Java 17, Gradle 8.9 und Android SDK 35 eine installierbare Debug-APK gebaut und ihre Signatur geprüft.
 
 Nach erfolgreichem Lauf unter **Actions → Lauf → Artifacts** das Archiv `LittleQuest-Android-<Laufnummer>` herunterladen und entpacken. Es enthält `LittleQuest.apk`. Die Downloads werden 14 Tage aufbewahrt. Es gibt keinen Google-Play-Upload und keine Veröffentlichung als Release; Store-Zugangsdaten sind nicht erforderlich.
 

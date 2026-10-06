@@ -16,7 +16,7 @@
 1. Diese Änderungen nach Freigabe auf den Default-Branch pushen.
 2. Ein dediziertes Bot-Konto oder einen geeigneten Personal Access Token für dieses Repository verwenden. Als Secret unter **Settings → Secrets and variables → Actions → New repository secret** den Namen **RENOVATE_TOKEN** hinterlegen. Den Token nicht in Dateien oder Chatnachrichten schreiben.
 3. Der Token braucht Lesezugriff auf Metadaten und Checks sowie Schreibrechte für Repository-Inhalte, Pull Requests und Issues (Dependency Dashboard). Für Aktualisierungen von Workflowdateien braucht er zusätzlich **Workflows: read and write**. Bei klassischen Tokens entsprechen dem `repo` und `workflow`. Organisationsfreigaben müssen ggf. durch einen Admin bestätigt werden.
-4. Branch-Schutz für den Default-Branch einrichten: **Code quality and tests**, **Build Android APK** und **Validate Renovate configuration** als Pflichtchecks auswählen. Squash-Merges müssen erlaubt sein. Erforderliche manuelle Reviews können Automerge blockieren; solche Regeln nicht stillschweigend umgehen.
+4. Branch-Schutz für den Default-Branch einrichten: **Validate Renovate configuration** als Pflichtcheck auswählen. **Code quality and tests** und **Build Android APK** laufen nur bei App- oder Buildänderungen und dürfen deshalb nicht pauschal als Pflichtchecks verlangt werden: Sonst bleiben PRs ohne solche Änderungen beim Merge blockiert. Renovate wartet weiterhin auf alle tatsächlich gestarteten Checks. Squash-Merges müssen erlaubt sein. Erforderliche manuelle Reviews können Automerge blockieren; solche Regeln nicht stillschweigend umgehen.
 5. Unter **Actions → Renovate → Run workflow** einen ersten Lauf starten. Außerhalb des Zeitfensters werden keine neuen Versionsupdates erstellt; bestehende grüne Update-PRs können gemerged werden.
 
 Das normale `GITHUB_TOKEN` wird nicht als Bot-Token verwendet: Damit erzeugte Änderungen starten die notwendigen PR-Workflows nicht zuverlässig. Die Workflows führen Code aus Update-PRs ohne Bot-Secret aus. Der Bot selbst verwendet immer die Konfiguration vom vertrauenswürdigen Default-Branch.
@@ -27,7 +27,7 @@ Solange Secret und Push fehlen, ist Renovate vorbereitet, aber nicht aktiv. GitH
 
 - `.github/workflows/renovate.yml`: Montagstermine, manueller Start und erneuter Lauf nach erfolgreichen Renovate-PR-Prüfungen.
 - `.github/workflows/renovate-config.yml`: offizieller Validator bei jedem Push und Pull Request; ohne Bot-Token.
-- `.github/workflows/check.yml`: Biome, Tests, synchronisierte Android-Assets und signierte Test-APK.
+- `.github/workflows/check.yml`: Biome, Tests, synchronisierte Android-Assets und signierte Test-APK; automatisch nur bei App- oder Buildänderungen, außerdem manuell startbar.
 
 `.github/renovate.json` enthält die Repository-Regeln. Die eingesetzte Renovate-Version ist festgelegt. `android/gradle-version.txt` ist die gemeinsame Quelle für die lokale und die CI-Gradle-Version. Die automatisierten Prüfungen müssen erfolgreich sein; notwendige Änderungen an Buildwerkzeugen werden andernfalls manuell im betreffenden Update-PR gelöst.
 
