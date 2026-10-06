@@ -1,0 +1,59 @@
+name: Little Quest checks and APK
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: android-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - name: Verify Android assets match the game
+        run: |
+          npm run android:assets
+          git diff --exit-code -- android/app/src/main/assets
+  android:
+    name: Build Android APK
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK components
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.9'
+      - name: Build installable debug APK
+        run: npm run android:build
+      - name: Verify APK signature
+        run: '"$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose dist/LittleQuest.apk'
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LittleQuest-Android-${{ github.run_number }}
+          path: dist/LittleQuest.apk
+          if-no-files-found: error
+          retention-days: 14
