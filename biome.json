@@ -17,5 +17,11 @@
     "enabled": true,
     "rules": { "preset": "recommended", "style": { "useTemplate": "error" } }
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } }
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "overrides": [
+    {
+      "includes": [".github/.release-please-manifest.json"],
+      "formatter": { "enabled": false }
+    }
+  ]
 }
