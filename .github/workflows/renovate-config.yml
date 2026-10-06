@@ -1,7 +1,15 @@
 name: Renovate config validation
 on:
   push:
+    paths:
+      - '.github/renovate.json'
+      - '.github/workflows/renovate.yml'
+      - '.github/workflows/renovate-config.yml'
   pull_request:
+    paths:
+      - '.github/renovate.json'
+      - '.github/workflows/renovate.yml'
+      - '.github/workflows/renovate-config.yml'
   workflow_dispatch:
 permissions:
   contents: read
