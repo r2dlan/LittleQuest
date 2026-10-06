@@ -1,0 +1,21 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "files": {
+    "includes": [
+      "**",
+      "!!android/app/src/main/assets",
+      "!!.android-tools",
+      "!!.android-gradle",
+      "!!android/**/build",
+      "!!dist",
+      "!!node_modules",
+      "!!package-lock.json"
+    ]
+  },
+  "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },
+  "linter": {
+    "enabled": true,
+    "rules": { "preset": "recommended", "style": { "useTemplate": "error" } }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } }
+}
