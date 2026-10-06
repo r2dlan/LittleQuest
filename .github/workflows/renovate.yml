@@ -1,5 +1,7 @@
 name: Renovate
 on:
+  push:
+    branches: [main]
   schedule:
     # UTC window covers Berlin summer and winter time; config enforces 09:00-15:00.
     - cron: '17 7-13 * * 1'

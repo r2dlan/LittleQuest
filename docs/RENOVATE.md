@@ -3,7 +3,9 @@
 ## Verhalten
 
 - Zeitzone: **Europe/Berlin**.
-- Neue Versionsupdates und Änderungen bestehender Update-Branches: **montags, 09:00 bis vor 15:00 Uhr**, inklusive automatischer Sommer-/Winterzeitumstellung.
+- Neue Update-Branches und Pull Requests: **montags, 09:00 bis vor 15:00 Uhr**, inklusive automatischer Sommer-/Winterzeitumstellung.
+- Bestehende Renovate-Branches werden bei jedem Bot-Lauf auf den aktuellen Stand von `main` gebracht (`rebaseWhen: behind-base-branch`, `updateNotScheduled: true`). Dafür startet der Bot auch bei jedem Push auf `main`. Diese Aktualisierungen sind außerhalb des Montagfensters erlaubt; dabei können auch neuere, mindestens sieben Tage alte Versionen in bestehende Update-Branches aufgenommen werden. Neue Commits auf den PR-Branches lösen die jeweils passenden Checks erneut aus.
+- Eigene Commits auf Renovate-Branches können die automatische Aktualisierung verhindern. Bei Bedarf im PR die Rebase-/Retry-Checkbox aktivieren und den Renovate-Workflow manuell starten; dabei kann Renovate eigene Änderungen am Update-Branch verwerfen.
 - Renovate läuft stündlich um Minute 17 im passenden UTC-Fenster. GitHub kann geplante Läufe verzögern; die Renovate-Konfiguration setzt das lokale Zeitfenster durch. Dies ist kein garantierter Lauf exakt um 09:00 Uhr.
 - Neue Versionen werden erst berücksichtigt, wenn ihre Veröffentlichung mindestens **sieben Tage** zurückliegt. Fehlt ein verlässlicher Veröffentlichungszeitpunkt, wird die Version nicht automatisch freigegeben. Das betrifft das Alter der neuen Version, nicht das Alter der aktuell installierten Version.
 - Jede Aktualisierung kommt als Pull Request mit Conventional Commit, z. B. `chore(deps): update dependency …`.
@@ -25,7 +27,7 @@ Solange Secret und Push fehlen, ist Renovate vorbereitet, aber nicht aktiv. GitH
 
 ## Workflows
 
-- `.github/workflows/renovate.yml`: Montagstermine, manueller Start und erneuter Lauf nach erfolgreichen Renovate-PR-Prüfungen.
+- `.github/workflows/renovate.yml`: Pushes auf `main` zum Aktualisieren bestehender PRs, Montagstermine, manueller Start und erneuter Lauf nach erfolgreichen Renovate-PR-Prüfungen.
 - `.github/workflows/renovate-config.yml`: offizieller Validator bei Pushes und Pull Requests mit Änderungen an `.github/renovate.json` oder einem der beiden Renovate-Workflows; ohne Bot-Token, außerdem manuell startbar. Reine App- oder Dokumentationsänderungen starten keine Renovate-Validierung.
 - `.github/workflows/check.yml`: Biome, Tests, synchronisierte Android-Assets und signierte Test-APK; automatisch nur bei App- oder Buildänderungen, außerdem manuell startbar.
 
