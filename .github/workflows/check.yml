@@ -10,6 +10,7 @@ on:
       - 'package-lock.json'
       - '.github/workflows/check.yml'
       - '.github/workflows/release-please.yml'
+      - '.github/workflows/android-release.yml'
       - '.github/release-please-config.json'
       - '!**/*.md'
   pull_request:
@@ -22,6 +23,7 @@ on:
       - 'package-lock.json'
       - '.github/workflows/check.yml'
       - '.github/workflows/release-please.yml'
+      - '.github/workflows/android-release.yml'
       - '.github/release-please-config.json'
       - '!**/*.md'
   workflow_dispatch:
@@ -80,7 +82,7 @@ jobs:
           # The legacy "tools" package is no longer available in the SDK repository.
           packages: platform-tools
       - name: Install Android SDK components
-        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0'
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
       - name: Read Gradle version
         id: gradle
         run: echo "version=$(cat android/gradle-version.txt)" >> "$GITHUB_OUTPUT"
@@ -89,12 +91,16 @@ jobs:
           gradle-version: ${{ steps.gradle.outputs.version }}
       - name: Build installable debug APK
         run: npm run android:build
+      - name: Build unsigned release App Bundle for store preparation
+        run: npm run android:bundle
       - name: Verify APK signature
-        run: '"$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose dist/LittleQuest.apk'
+        run: '"$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose dist/LittleQuest.apk'
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact-name || format('LittleQuest-Android-{0}', github.run_number) }}
-          path: dist/LittleQuest.apk
+          path: |
+            dist/LittleQuest.apk
+            dist/LittleQuest-unsigned.aab
           if-no-files-found: error
           retention-days: 14

@@ -20,6 +20,15 @@ public class MainActivity extends Activity {
         super.onCreate(state);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         game = new WebView(this);
+        game.setOnApplyWindowInsetsListener((view, insets) -> {
+            if (android.os.Build.VERSION.SDK_INT >= 28 && insets.getDisplayCutout() != null) {
+                android.view.DisplayCutout cutout = insets.getDisplayCutout();
+                view.setPadding(cutout.getSafeInsetLeft(), cutout.getSafeInsetTop(), cutout.getSafeInsetRight(), cutout.getSafeInsetBottom());
+            } else {
+                view.setPadding(0, 0, 0, 0);
+            }
+            return insets;
+        });
         game.getSettings().setJavaScriptEnabled(true);
         game.getSettings().setDomStorageEnabled(true);
         game.getSettings().setAllowFileAccess(false);
@@ -34,12 +43,15 @@ public class MainActivity extends Activity {
             }
         });
         game.setWebViewClient(new WebViewClient() {
-            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) { return true; }
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return !"appassets.androidplatform.net".equals(request.getUrl().getHost())
+                    || !"https".equals(request.getUrl().getScheme());
+            }
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String path = request.getUrl().getPath();
                 if (!"appassets.androidplatform.net".equals(request.getUrl().getHost()) || path == null || path.contains("..")) return empty();
                 if (path.equals("/")) path = "/index.html";
-                String mime = path.endsWith(".js") ? "text/javascript" : path.endsWith(".css") ? "text/css" : path.endsWith(".svg") ? "image/svg+xml" : path.endsWith(".webmanifest") ? "application/manifest+json" : "text/html";
+                String mime = path.endsWith(".js") ? "text/javascript" : path.endsWith(".css") ? "text/css" : path.endsWith(".svg") ? "image/svg+xml" : path.endsWith(".json") ? "application/json" : path.endsWith(".webmanifest") ? "application/manifest+json" : "text/html";
                 try { return new WebResourceResponse(mime, "UTF-8", getAssets().open(path.substring(1))); }
                 catch (IOException exception) { return empty(); }
             }

@@ -6,12 +6,37 @@ if (versionParts.size() != 3 || versionParts.any { it < 0 } || versionParts[0] >
 }
 android {
     namespace 'de.r2dlan.littlequest'
-    compileSdk 35
+    compileSdk 36
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
     defaultConfig {
         applicationId 'de.r2dlan.littlequest'
         minSdk 26
-        targetSdk 35
+        targetSdk 36
         versionCode versionParts[0] * 1000000 + versionParts[1] * 1000 + versionParts[2]
         versionName appVersion
+    }
+    def signingKeys = ['ANDROID_KEYSTORE_PATH', 'ANDROID_KEYSTORE_PASSWORD', 'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD']
+    def signingValues = signingKeys.collect { System.getenv(it) }
+    if (signingValues.any { it } && !signingValues.every { it }) {
+        throw new GradleException('Provide all four Android signing environment variables or none')
+    }
+    if (signingValues.every { it }) {
+        signingConfigs {
+            release {
+                storeFile file(signingValues[0])
+                storePassword signingValues[1]
+                keyAlias signingValues[2]
+                keyPassword signingValues[3]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            debuggable false
+            if (signingValues.every { it }) signingConfig signingConfigs.release
+        }
     }
 }

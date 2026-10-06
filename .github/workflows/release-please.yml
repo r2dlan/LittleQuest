@@ -74,4 +74,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ needs.release.outputs.tag }}
-        run: gh release upload "$RELEASE_TAG" dist/LittleQuest.apk --clobber
+        run: gh release upload "$RELEASE_TAG" dist/LittleQuest.apk dist/LittleQuest-unsigned.aab --clobber

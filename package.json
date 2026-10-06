@@ -10,7 +10,10 @@
     "android:build": "./scripts/build-android.sh",
     "check": "biome check --error-on-warnings .",
     "fix": "biome check --write . && npm run android:assets",
-    "hooks:install": "git config core.hooksPath .githooks"
+    "hooks:install": "git config core.hooksPath .githooks",
+    "android:bundle": "./scripts/build-android.sh --bundle",
+    "android:release": "./scripts/build-android.sh --release",
+    "store:check": "node scripts/check-store.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14"

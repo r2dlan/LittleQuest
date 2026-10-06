@@ -1,0 +1,62 @@
+name: Signed Android release build
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Release tag or commit to build
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  signed-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - id: gradle
+        run: echo "version=$(cat android/gradle-version.txt)" >> "$GITHUB_OUTPUT"
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: ${{ steps.gradle.outputs.version }}
+      - name: Build with upload key
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/littlequest-upload.jks
+        run: |
+          set -eu
+          : "${ANDROID_KEYSTORE_BASE64:?Configure ANDROID_KEYSTORE_BASE64}"
+          trap 'rm -f "$ANDROID_KEYSTORE_PATH"' EXIT
+          node --input-type=module -e 'import { writeFileSync } from "node:fs"; writeFileSync(process.env.ANDROID_KEYSTORE_PATH, Buffer.from(process.env.ANDROID_KEYSTORE_BASE64, "base64"), { mode: 0o600 });'
+          npm run android:release
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose dist/LittleQuest-release.apk
+          jarsigner -verify dist/LittleQuest.aab
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LittleQuest-signed-${{ github.run_number }}
+          path: |
+            dist/LittleQuest-release.apk
+            dist/LittleQuest.aab
+          if-no-files-found: error
+          retention-days: 14

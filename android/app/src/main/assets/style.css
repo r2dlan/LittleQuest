@@ -198,6 +198,9 @@ header small {
   display: none;
 }
 article {
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  touch-action: pan-y;
   width: min(440px, 100%);
   background: #183c31;
   border: 1px solid #bfc78b80;
@@ -536,4 +539,44 @@ header {
 #toast {
   z-index: 6;
   pointer-events: none;
+}
+.utilityPanel {
+  z-index: 12;
+}
+.setting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  line-height: 1.4;
+}
+.setting input {
+  width: 24px;
+  height: 24px;
+  accent-color: #ebc574;
+}
+.menuLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+article a {
+  color: #ffd17a;
+}
+.hideHints #controls .swipeHint {
+  visibility: hidden;
+}
+.largeText article p,
+.largeText #hint {
+  font-size: 17px;
+}
+.largeText #quest {
+  width: min(310px, 55vw);
+}
+.largeText #quest strong {
+  font-size: 19px;
+}
+.reducedMotion #toast {
+  transition: none;
 }

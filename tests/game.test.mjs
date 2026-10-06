@@ -3,13 +3,16 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 import * as quest from "../web/quest.js";
+import * as settingsModule from "../web/settings.js";
 import * as swipe from "../web/swipe.js";
 import * as world from "../web/world.js";
 
-function boot(saved) {
+function boot(saved, savedSettings) {
   const elements = new Map(),
     events = {},
     memory = new Map(saved ? [["littlequest-v1", JSON.stringify(saved)]] : []);
+  if (savedSettings)
+    memory.set("littlequest-settings-v1", JSON.stringify(savedSettings));
   const context = new Proxy(
     { createLinearGradient: () => ({ addColorStop() {} }) },
     { get: (o, k) => o[k] ?? (() => {}) },
@@ -20,7 +23,7 @@ function boot(saved) {
         textContent: "",
         style: {},
         setPointerCapture() {},
-        hidden: id === "dialog",
+        hidden: id === "dialog" || id.endsWith("Panel"),
         classList: { add() {}, remove() {} },
         getContext: () => context,
       });
@@ -30,7 +33,9 @@ function boot(saved) {
     ...quest,
     ...world,
     ...swipe,
+    ...settingsModule,
     document: {
+      body: { classList: { add() {}, remove() {} } },
       getElementById: element,
       querySelectorAll: () => [],
       addEventListener: (k, f) => (events[k] = f),
@@ -59,7 +64,13 @@ function boot(saved) {
     sandbox,
   );
   element("play").onclick();
-  return { d: sandbox.driver, e: element, memory };
+  return {
+    d: sandbox.driver,
+    e: element,
+    memory,
+    events,
+    document: sandbox.document,
+  };
 }
 const advance = (d, seconds) => {
   for (let i = 0; i < seconds * 60; i++) d.update(1 / 60);
@@ -196,4 +207,61 @@ test("Left swipe moves, releasing or losing capture stops, pause clears touch", 
   const endX = d.p.x;
   advance(d, 0.2);
   assert.equal(d.p.x, endX);
+});
+
+test("Backgrounding saves position and progress and requires explicit resume", () => {
+  const { d, e, memory, events, document } = boot();
+  Object.assign(d.p, { x: 1300, y: 600 });
+  d.getState().accepted = true;
+  d.down("right");
+  advance(d, 0.2);
+  document.hidden = true;
+  events.visibilitychange();
+  const stopped = d.p.x;
+  advance(d, 0.5);
+  assert.equal(d.p.x, stopped);
+  assert.equal(e("menu").hidden, false);
+  const save = JSON.parse(memory.get("littlequest-v1"));
+  assert.equal(save.accepted, true);
+  assert.equal(save.x, stopped);
+  document.hidden = false;
+  advance(d, 0.3);
+  assert.equal(d.p.x, stopped);
+  e("play").onclick();
+  advance(d, 0.3);
+  assert.equal(d.p.x, stopped);
+  const restored = boot(save);
+  assert.equal(restored.d.p.x, stopped);
+  assert.equal(restored.d.getState().accepted, true);
+});
+
+test("Settings survive restart, reset preserves settings, panels pause movement", () => {
+  const { d, e, memory } = boot();
+  Object.assign(d.p, { x: 1300, y: 600 });
+  e("pause").onclick();
+  e("settingsOpen").onclick();
+  assert.equal(e("settingsPanel").hidden, false);
+  e("largeText").checked = true;
+  e("largeText").onchange();
+  e("reducedMotion").checked = true;
+  e("reducedMotion").onchange();
+  d.down("right");
+  advance(d, 0.5);
+  assert.equal(d.p.x, 1300);
+  e("settingsClose").onclick();
+  assert.equal(e("settingsPanel").hidden, true);
+  e("reset").onclick();
+  const stored = JSON.parse(memory.get("littlequest-settings-v1"));
+  assert.equal(stored.largeText, true);
+  const restored = boot(null, stored);
+  assert.equal(restored.e("largeText").checked, true);
+  assert.equal(restored.e("reducedMotion").checked, true);
+  assert.deepEqual(
+    settingsModule.normalizeSettings({ showHints: "wrong", largeText: true }),
+    {
+      showHints: true,
+      largeText: true,
+      reducedMotion: false,
+    },
+  );
 });

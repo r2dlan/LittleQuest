@@ -1,0 +1,30 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #f9efd7;
+  background: #142e2a;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 760px;
+  margin: auto;
+  padding: 28px 24px;
+}
+p {
+  line-height: 1.7;
+}
+a {
+  color: #ffd17a;
+}
+h1 {
+  line-height: 1.2;
+}
+h2 {
+  margin-top: 32px;
+}
+#draft {
+  padding: 16px;
+  border: 1px solid #ffd17a;
+  border-radius: 12px;
+}

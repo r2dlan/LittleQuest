@@ -4,6 +4,10 @@ android/.gradle/
 android/local.properties
 android/**/build/
 *.apk
+*.aab
+*.jks
+*.keystore
+keystore.properties
 
 .android-tools/
 .android-gradle/

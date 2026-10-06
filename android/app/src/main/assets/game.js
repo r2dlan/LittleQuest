@@ -9,6 +9,7 @@ import {
   pressSwitch,
   repairBridge,
 } from "./quest.js";
+import { normalizeSettings } from "./settings.js";
 import { swipeDirection } from "./swipe.js";
 import {
   boards,
@@ -35,11 +36,20 @@ try {
   storage = false;
 }
 const p = { ...spawn(s), face: "down", walking: false };
+let settings = normalizeSettings();
+try {
+  settings = normalizeSettings(
+    JSON.parse(localStorage.getItem("littlequest-settings-v1")),
+  );
+} catch {
+  // Play remains available if device storage is unavailable.
+}
 let W = 960,
   H = 540,
   cameraX = 0,
   cameraY = 0,
   time = 0,
+  animationTime = 0,
   paused = true,
   dialogAction = null,
   toastUntil = 0,
@@ -65,12 +75,13 @@ function save() {
   s.viewVersion = 2;
   try {
     localStorage.setItem("littlequest-v1", JSON.stringify(s));
+    storage = true;
   } catch {
     storage = false;
   }
-  if (!storage)
-    $("saveNote").textContent =
-      "Speichern ist hier nicht verfügbar. Lass das Spiel geöffnet.";
+  $("saveNote").textContent = storage
+    ? "Dein Fortschritt wird automatisch auf diesem Gerät gespeichert."
+    : "Speichern ist hier nicht verfügbar. Lass das Spiel geöffnet.";
 }
 function hud() {
   const [a, b] = objective(s);
@@ -326,6 +337,7 @@ addEventListener("keydown", (e) => {
     togglePause();
     return;
   }
+  if (e.target?.closest?.("input, button, a, select, textarea")) return;
   const k = mapping[e.key];
   if (k) {
     e.preventDefault();
@@ -353,6 +365,7 @@ for (const b of document.querySelectorAll("[data-key]")) {
   b.onpointercancel = release;
 }
 function togglePause() {
+  if (closePanel()) return;
   if (!$("dialog").hidden) return;
   paused = !paused;
   clearInput();
@@ -375,6 +388,52 @@ $("reset").onclick = () => {
   hud();
   save();
 };
+function applySettings() {
+  for (const key of ["showHints", "largeText", "reducedMotion"])
+    $(key).checked = settings[key];
+  document.body.classList[settings.showHints ? "remove" : "add"]("hideHints");
+  document.body.classList[settings.largeText ? "add" : "remove"]("largeText");
+  document.body.classList[settings.reducedMotion ? "add" : "remove"](
+    "reducedMotion",
+  );
+}
+for (const key of ["showHints", "largeText", "reducedMotion"]) {
+  $(key).onchange = () => {
+    settings[key] = $(key).checked;
+    applySettings();
+    try {
+      localStorage.setItem("littlequest-settings-v1", JSON.stringify(settings));
+    } catch {
+      toast(
+        "Einstellungen gelten nur für diese Sitzung: Speichern ist nicht verfügbar.",
+      );
+    }
+  };
+}
+function closePanel() {
+  let closed = false;
+  for (const panel of ["settings", "help", "privacy"]) {
+    if (!$(`${panel}Panel`).hidden) {
+      $(`${panel}Panel`).hidden = true;
+      closed = true;
+    }
+  }
+  $("menu").inert = false;
+  return closed;
+}
+for (const panel of ["settings", "help", "privacy"]) {
+  $(`${panel}Open`).onclick = () => {
+    clearInput();
+    paused = true;
+    save();
+    closePanel();
+    $("menu").inert = true;
+    $(`${panel}Panel`).hidden = false;
+    $(`${panel}Close`).focus?.();
+  };
+  $(`${panel}Close`).onclick = closePanel;
+}
+applySettings();
 if (s.accepted) $("play").textContent = "Abenteuer fortsetzen";
 addEventListener("blur", () => {
   clearInput();
@@ -390,8 +449,10 @@ document.addEventListener("visibilitychange", () => {
     save();
   }
 });
+addEventListener("pagehide", save);
 function update(dt) {
   time += dt;
+  if (!settings.reducedMotion) animationTime += dt;
   if (time > toastUntil) $("toast").classList.remove("visible");
   if (paused || !$("dialog").hidden) return;
   let dx = (keys.has("right") ? 1 : 0) - (keys.has("left") ? 1 : 0),
@@ -576,12 +637,12 @@ function house(o) {
 function person(x, y, npc = false, name = "") {
   shadow(x, y + 3, 23);
   const face = npc ? "down" : p.face,
-    bob = !npc && p.walking ? Math.sin(time * 14) * 1 : 0;
+    bob = !npc && p.walking ? Math.sin(animationTime * 14) * 1 : 0;
   ctx.save();
   ctx.translate(Math.round(x), Math.round(y + bob));
   if (face === "left") ctx.scale(-1, 1);
   const side = face === "left" || face === "right";
-  const step = !npc && p.walking ? Math.sin(time * 14) * 2 : 0;
+  const step = !npc && p.walking ? Math.sin(animationTime * 14) * 2 : 0;
   rect(-7, -4, 6, 8 + step, "#354b4b");
   rect(2, -4, 6, 8 - step, "#354b4b");
   rect(-8, 4 + step, 8, 3, "#493d2c");
@@ -647,7 +708,7 @@ function gear(x, y) {
   shadow(x, y + 5, 24);
   ctx.save();
   ctx.translate(x, y - 3);
-  ctx.rotate(time * 0.4);
+  ctx.rotate(animationTime * 0.4);
   for (let i = 0; i < 8; i++) {
     ctx.rotate(Math.PI / 4);
     rect(-3, -13, 6, 6, "#c5b478");
@@ -705,7 +766,13 @@ function draw() {
   rect(1650, 0, 180, WORLD.height, "#5c9f9d");
   for (let y = 0; y < WORLD.height; y += 35) {
     for (let i = 0; i < 3; i++)
-      rect(1662 + i * 50 + Math.sin(time + y) * 5, y, 24, 2, "#a5d7c0");
+      rect(
+        1662 + i * 50 + Math.sin(animationTime + y) * 5,
+        y,
+        24,
+        2,
+        "#a5d7c0",
+      );
   }
   rect(1642, 0, 8, WORLD.height, "#b0bc82");
   rect(1830, 0, 8, WORLD.height, "#b0bc82");
@@ -760,7 +827,7 @@ function draw() {
   rect(2750, 466, 410, 7, "#b2c58d");
   for (let i = 0; i < 24; i++)
     rect(
-      2775 + ((i * 43 + time * 9) % 355),
+      2775 + ((i * 43 + animationTime * 9) % 355),
       250 + (i % 6) * 33,
       25,
       2,
@@ -811,7 +878,13 @@ function draw() {
   for (const item of boards)
     if (!s.boards.includes(item.id) && (item.id !== 3 || s.foxFed)) {
       board(item.x, item.y);
-      rect(item.x - 1, item.y - 18 + Math.sin(time * 3) * 2, 3, 3, "#ffe2a0");
+      rect(
+        item.x - 1,
+        item.y - 18 + Math.sin(animationTime * 3) * 2,
+        3,
+        3,
+        "#ffe2a0",
+      );
     }
   for (const item of gears)
     if (
@@ -849,7 +922,7 @@ function draw() {
   if (s.machineFixed) {
     rect(2545, 541, 95, 5, "#9ed9c3");
     for (let i = 0; i < 5; i++)
-      rect(2545 + ((i * 20 + time * 25) % 90), 541, 8, 2, "#deedce");
+      rect(2545 + ((i * 20 + animationTime * 25) % 90), 541, 8, 2, "#deedce");
   }
   for (const t of [
     { x: 875, y: 520, text: "← WALD" },
@@ -866,7 +939,7 @@ function frame(now) {
   const dt = Math.min((now - last) / 1000, 0.033);
   last = now;
   update(dt);
-  draw();
+  if (!document.hidden) draw();
   requestAnimationFrame(frame);
 }
 hud();

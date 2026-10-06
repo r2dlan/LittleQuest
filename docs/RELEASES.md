@@ -6,7 +6,7 @@
 - `always-update: true` aktualisiert den bestehenden Release-PR auch bei Änderungen auf `main`, die seine Release-Notizen nicht verändern. So übernimmt der PR beispielsweise CI-Fixes und startet mit dem aktuellen Stand seine Prüfungen erneut. Das setzt einen erfolgreichen Release-Please-Lauf mit dem eingerichteten Bot-Token voraus.
 - Der Release-PR aktualisiert `package.json`, `package-lock.json`, `CHANGELOG.md` und `.github/.release-please-manifest.json`. Ausgangsversion ist `0.1.0`. Die Konfiguration liegt unter `.github/release-please-config.json`.
 - Release Please verwaltet die Formatierung des Versionsmanifests. Nur für `.github/.release-please-manifest.json` ist der Biome-Formatter deaktiviert; die JSON-Prüfung und die Regeln für die übrigen Dateien bleiben aktiv.
-- Nach dem Merge des Release-PRs erstellt Release Please das GitHub-Release mit einem Tag wie `v0.2.0`. Der gleiche Workflow ruft die bestehende APK-Pipeline für genau diesen Tag auf. Erst nach erfolgreichen Checks, Build und Signaturprüfung wird `LittleQuest.apk` an das Release angehängt.
+- Nach dem Merge des Release-PRs erstellt Release Please das GitHub-Release mit einem Tag wie `v0.2.0`. Der gleiche Workflow ruft die bestehende APK-Pipeline für genau diesen Tag auf. Erst nach erfolgreichen Checks, Build und Signaturprüfung werden `LittleQuest.apk` und das zur Vorbereitung dienende, unsignierte `LittleQuest-unsigned.aab` an das Release angehängt.
 - Wenn der APK-Build fehlschlägt, existiert das Release zunächst ohne APK. Nach Behebung des Buildproblems **Actions → Release Please → Run workflow** starten und unter `release-tag` das vorhandene Tag eingeben. Der Build verwendet weiterhin den Code des Tags; Codefixes benötigen deshalb einen neuen Release-Tag. Ohne Tag-Eingabe wird der normale Release-Please-Lauf ausgeführt.
 - Android liest die Version aus `package.json`. Der `versionCode` wird als `major * 1000000 + minor * 1000 + patch` berechnet; Minor und Patch müssen jeweils unter 1000 bleiben, Major höchstens 2100.
 - Die APK bleibt eine Debug-APK mit dem Schlüssel des jeweiligen GitHub-Runners. Für verlässliche Updates über bestehende Installationen ist später ein dauerhafter Signaturschlüssel erforderlich. Google Play wird nicht angesprochen.
@@ -20,3 +20,7 @@
 Ein eigener Bot-Token sorgt dafür, dass Änderungen von Release Please die PR-Prüfungen starten. Das normale `GITHUB_TOKEN` würde diese Folgeereignisse unterdrücken. Der APK-Upload nutzt das kurzlebige Workflow-Token mit Schreibrecht für Repository-Inhalte.
 
 Referenz: [Release Please Action](https://github.com/googleapis/release-please-action).
+
+## Store-Builds
+
+Für Google Play stehen ein gesonderter manueller signierter Build und die [Signierungsanleitung](store/SIGNING.md) bereit. Die normalen Release-Please-Downloads bleiben eine Debug-APK und ein unsigniertes AAB; sie sind nicht als Play-Store-Upload gedacht.

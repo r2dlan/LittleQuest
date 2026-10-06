@@ -1,4 +1,4 @@
-const CACHE = "littlequest-v5";
+const CACHE = "littlequest-v7";
 const FILES = [
   "./",
   "./index.html",
@@ -7,6 +7,11 @@ const FILES = [
   "./quest.js",
   "./world.js",
   "./swipe.js",
+  "./settings.js",
+  "./privacy.html",
+  "./privacy.css",
+  "./privacy.js",
+  "./privacy-details.json",
   "./icon.svg",
   "./manifest.webmanifest",
 ];

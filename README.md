@@ -38,7 +38,7 @@ Nach Änderungen am Spiel:
 npm run android:assets
 ```
 
-Den Ordner `android` in Android Studio öffnen, Gradle synchronisieren und auf einem Android-Gerät oder Emulator starten. Erforderlich: JDK 17, Android SDK 35; Android Gradle Plugin 8.7.3 / Gradle 8.9. Android Studio kann die passende Gradle-Version beim Import bereitstellen; ein Gradle-Wrapper ist noch nicht enthalten. Alternativ mit installiertem Gradle 8.9: `gradle -p android assembleDebug`. Die APK liegt anschließend unter `android/app/build/outputs/apk/debug/`.
+Den Ordner `android` in Android Studio öffnen, Gradle synchronisieren und auf einem Android-Gerät oder Emulator starten. Erforderlich: JDK 17, Android SDK 36; Android Gradle Plugin 8.10.1 / Gradle-Version aus `android/gradle-version.txt`. Android Studio kann die passende Gradle-Version beim Import bereitstellen; ein Gradle-Wrapper ist noch nicht enthalten. Alternativ mit der in `android/gradle-version.txt` festgelegten Gradle-Version: `gradle -p android assembleDebug`. Die APK liegt anschließend unter `android/app/build/outputs/apk/debug/`.
 
 **Buildstatus:** Die Debug-APK wurde erfolgreich gebaut. APK-Signatur, Paketkennung, Mindestversion und eingebettete Spieldateien wurden geprüft. Ein Lauf auf einem Android-Gerät oder Emulator wurde noch nicht geprüft. Die APK ist für lokale Tests, keine fertige Store-Version.
 
@@ -112,7 +112,7 @@ Codex bereitet am Feature-Ende eine passende Nachricht vor. Commit und Push erfo
 
 ## Android-APK auf GitHub bauen
 
-Der Workflow **Little Quest checks and APK** startet bei Pushes und Pull Requests nur für Änderungen unter `web/` oder `android/`, an `sync-android.mjs`, `scripts/build-android.sh`, `package.json`, `package-lock.json` oder am APK-Workflow selbst. Markdown-Dateien sind ausgeschlossen. Änderungen ausschließlich an Dokumentation, Agent-Anweisungen oder Renovate starten keinen APK-Build. Manuell lässt er sich weiterhin über **Actions → Little Quest checks and APK → Run workflow** starten. Zuerst laufen Biome, Spieltests und die Prüfung der Android-Assets. Nur danach wird mit Java 17, Gradle 8.9 und Android SDK 35 eine installierbare Debug-APK gebaut und ihre Signatur geprüft.
+Der Workflow **Little Quest checks and APK** startet bei Pushes und Pull Requests nur für Änderungen unter `web/` oder `android/`, an `sync-android.mjs`, `scripts/build-android.sh`, `package.json`, `package-lock.json` oder am APK-Workflow selbst. Markdown-Dateien sind ausgeschlossen. Änderungen ausschließlich an Dokumentation, Agent-Anweisungen oder Renovate starten keinen APK-Build. Manuell lässt er sich weiterhin über **Actions → Little Quest checks and APK → Run workflow** starten. Zuerst laufen Biome, Spieltests und die Prüfung der Android-Assets. Nur danach wird mit Java 17, der festgelegten Gradle-Version und Android SDK 36 eine installierbare Debug-APK gebaut und ihre Signatur geprüft.
 
 Nach erfolgreichem Lauf unter **Actions → Lauf → Artifacts** das Archiv `LittleQuest-Android-<Laufnummer>` herunterladen und entpacken. Es enthält `LittleQuest.apk`. Die Downloads werden 14 Tage aufbewahrt. Release Please veröffentlicht zusätzlich die APK als GitHub-Release-Download. Es gibt keinen Google-Play-Upload; Store-Zugangsdaten sind nicht erforderlich.
 
@@ -127,3 +127,9 @@ Release Please aktualisiert bei jedem Push auf `main` einen Release-PR mit Versi
 ## Renovate
 
 Die Renovate GitHub App erstellt Versionsupdates montags zwischen 09:00 und 15:00 Uhr (Europe/Berlin) als Pull Requests und merged sie nach erfolgreichen Checks. Konfiguration, Validierungsworkflow und GitHub-Einrichtung sind in [docs/RENOVATE.md](docs/RENOVATE.md) beschrieben. Ein eigener Renovate-Bot-Workflow und das Repository-Secret `RENOVATE_TOKEN` sind dafür nicht erforderlich.
+
+## Vorbereitung für Google Play
+
+LittleQuest richtet sich an Spieler ab 6 Jahren. Store-Texte, Datenschutzangaben und der Testplan liegen unter [docs/store/PLAY_STORE.md](docs/store/PLAY_STORE.md). Die Android-App verwendet API 36. `npm run android:bundle` baut ein unsigniertes Release-App-Bundle; `npm run android:release` erstellt mit den vier Signierungsvariablen eine signierte APK und ein AAB. Der manuelle Workflow **Signed Android release build** nutzt dafür die hinterlegten Upload-Key-Secrets. Es gibt weiterhin keinen Google-Play-Upload.
+
+Im Pausenmenü findest du Steuerungshilfe, Datenschutz und Einstellungen für Hinweise, größere Texte und reduzierte Animationen. Einstellungen und Spielstand werden getrennt lokal gespeichert. `npm run store:check` zeigt offene Store-Texte, Datenschutz-URL und Grafikdateien an.

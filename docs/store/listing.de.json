@@ -1,0 +1,13 @@
+{
+  "title": "Little Quest",
+  "shortDescription": "Ein ruhiges Offline-Abenteuer: Erkunde die Welt und hilf ihren Bewohnern.",
+  "fullDescription": "Ein ruhiger Morgen in Weidendorf — doch die Brücke ist kaputt. Hilf Jona, finde drei Bretter und entdecke, warum ein kleiner Fuchs Äpfel so sehr liebt. Danach wartet Mina mit einer alten Wassermaschine und einem Rätsel in der Flüsterhöhle.\n\nLittle Quest ist ein kleines Abenteuer in einer 2D-Welt aus der Vogelperspektive. Erkunde Wald, Dorf, Höhle und See, sammle Gegenstände und löse zwei zusammenhängende Aufgaben.\n\n• Offline spielbar\n• Steuerung durch Wischen mit der linken Hand\n• Automatisch gespeicherter Fortschritt\n• Pausenmenü und anpassbare Texthinweise\n• Keine Werbung, keine In-App-Käufe und kein Benutzerkonto\n\nGedacht für Spielerinnen und Spieler ab 6 Jahren. Die offizielle Altersfreigabe wird über Google Play bestimmt.",
+  "defaultLanguage": "de-DE",
+  "category": "GAME_ADVENTURE",
+  "publisher": "Daniel Andres",
+  "supportEmail": "moin@daniel-andres.com",
+  "intendedMinimumAge": 6,
+  "containsAds": false,
+  "containsInAppPurchases": false,
+  "requiresAccount": false
+}
