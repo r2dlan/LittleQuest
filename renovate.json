@@ -1,0 +1,73 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":automergeRequireAllStatusChecks"],
+  "timezone": "Europe/Berlin",
+  "schedule": ["* 9-14 * * 1"],
+  "updateNotScheduled": false,
+  "dependencyDashboard": true,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "platformAutomerge": false,
+  "ignoreTests": false,
+  "prCreation": "immediate",
+  "prConcurrentLimit": 3,
+  "rangeStrategy": "pin",
+  "enabledManagers": ["npm", "github-actions", "gradle", "custom.regex"],
+  "ignorePaths": [
+    "android/app/src/main/assets/**",
+    ".android-tools/**",
+    ".android-gradle/**",
+    "dist/**"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["* 9-14 * * 1"]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^biome\\.json$/"],
+      "matchStrings": [
+        "https://biomejs\\.dev/schemas/(?<currentValue>[0-9.]+)/schema\\.json"
+      ],
+      "datasourceTemplate": "npm",
+      "depNameTemplate": "@biomejs/biome"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^android/gradle-version\\.txt$/"],
+      "matchStrings": ["(?<currentValue>[0-9]+\\.[0-9]+(?:\\.[0-9]+)?)"],
+      "datasourceTemplate": "gradle-version",
+      "depNameTemplate": "gradle",
+      "versioningTemplate": "gradle"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/renovate(?:-config)?\\.yml$/"
+      ],
+      "matchStrings": [
+        "renovate-version: (?<currentValue>[0-9.]+)",
+        "renovate/renovate:(?<currentValue>[0-9.]+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "renovate/renovate"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["@biomejs/biome"],
+      "groupName": "Biome and schema"
+    },
+    {
+      "matchPackageNames": ["renovate/renovate"],
+      "groupName": "Renovate runtime and validator"
+    }
+  ],
+  "minimumReleaseAge": "7 days",
+  "minimumReleaseAgeBehaviour": "timestamp-required"
+}

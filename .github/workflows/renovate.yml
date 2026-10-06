@@ -1,0 +1,49 @@
+name: Renovate
+on:
+  schedule:
+    # UTC window covers Berlin summer and winter time; config enforces 09:00-15:00.
+    - cron: '17 7-13 * * 1'
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Little Quest checks and APK, Renovate config validation]
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+jobs:
+  renovate:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       startsWith(github.event.workflow_run.head_branch, 'renovate/') &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # Always use trusted default-branch configuration, including workflow_run events.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - name: Check bot credentials
+        env:
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+        run: |
+          if [ -z "$RENOVATE_TOKEN" ]; then
+            echo '::error::Configure the RENOVATE_TOKEN repository secret. GITHUB_TOKEN cannot trigger PR checks.'
+            exit 1
+          fi
+      - name: Renovate updates and merge successful PRs
+        uses: renovatebot/github-action@v46.3.5
+        with:
+          token: ${{ secrets.RENOVATE_TOKEN }}
+          renovate-version: 44.132.2
+        env:
+          RENOVATE_PLATFORM: github
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_ONBOARDING: 'false'
+          RENOVATE_REQUIRE_CONFIG: required
+          RENOVATE_AUTODISCOVER: 'false'
+          RENOVATE_GIT_AUTHOR: 'Renovate Bot <renovate@users.noreply.github.com>'

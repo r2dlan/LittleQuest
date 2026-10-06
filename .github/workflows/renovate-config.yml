@@ -1,0 +1,20 @@
+name: Renovate config validation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    name: Validate Renovate configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate configuration without accessing the repository API
+        run: >-
+          docker run --rm
+          -v "$PWD:/workspace:ro" -w /workspace
+          --entrypoint renovate-config-validator
+          renovate/renovate:44.132.2 --strict renovate.json

@@ -119,3 +119,7 @@ Nach erfolgreichem Lauf unter **Actions → Lauf → Artifacts** das Archiv `Lit
 GitHub baut auf jedem frischen Runner mit einem eigenen Debugschlüssel. Deshalb lassen sich diese Test-APKs nicht zuverlässig als Update über die lokal signierte App installieren. Eine bestehende Installation gegebenenfalls vorher deinstallieren (löscht ihren Spielstand). Ein dauerhafter Signaturschlüssel für Updates wird vor einer späteren Veröffentlichung separat eingerichtet.
 
 Die Pipeline wird erst nach Commit und Push auf GitHub ausgeführt. Lokal sind die Checks und der Android-Build geprüft; der erste GitHub-Lauf steht noch aus.
+
+## Renovate
+
+Versionsupdates kommen montags zwischen 09:00 und 15:00 Uhr (Europe/Berlin) als Pull Requests. Nach erfolgreichen Checks merged Renovate automatisch. Konfiguration, Workflows und die noch erforderliche GitHub-Einrichtung sind in [docs/RENOVATE.md](docs/RENOVATE.md) beschrieben. Dafür ist das Repository-Secret `RENOVATE_TOKEN` nötig; es ist bisher nicht eingerichtet.
