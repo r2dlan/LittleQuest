@@ -1,0 +1,16 @@
+{
+  "name": "Little Quest",
+  "short_name": "Little Quest",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#183c31",
+  "theme_color": "#183c31",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
