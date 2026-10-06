@@ -17,4 +17,4 @@ jobs:
           docker run --rm
           -v "$PWD:/workspace:ro" -w /workspace
           --entrypoint renovate-config-validator
-          renovate/renovate:44.132.2 --strict renovate.json
+          renovate/renovate:44.132.2 --strict .github/renovate.json

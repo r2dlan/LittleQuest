@@ -29,7 +29,7 @@ Solange Secret und Push fehlen, ist Renovate vorbereitet, aber nicht aktiv. GitH
 - `.github/workflows/renovate-config.yml`: offizieller Validator bei jedem Push und Pull Request; ohne Bot-Token.
 - `.github/workflows/check.yml`: Biome, Tests, synchronisierte Android-Assets und signierte Test-APK.
 
-`renovate.json` enthält die Repository-Regeln. Die eingesetzte Renovate-Version ist festgelegt. `android/gradle-version.txt` ist die gemeinsame Quelle für die lokale und die CI-Gradle-Version. Die automatisierten Prüfungen müssen erfolgreich sein; notwendige Änderungen an Buildwerkzeugen werden andernfalls manuell im betreffenden Update-PR gelöst.
+`.github/renovate.json` enthält die Repository-Regeln. Die eingesetzte Renovate-Version ist festgelegt. `android/gradle-version.txt` ist die gemeinsame Quelle für die lokale und die CI-Gradle-Version. Die automatisierten Prüfungen müssen erfolgreich sein; notwendige Änderungen an Buildwerkzeugen werden andernfalls manuell im betreffenden Update-PR gelöst.
 
 Eine Veröffentlichung bei Google Play erfolgt weiterhin nicht.
 
