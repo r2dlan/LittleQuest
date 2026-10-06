@@ -48,13 +48,8 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/^\\.github/workflows/renovate(?:-config)?\\.yml$/"
-      ],
-      "matchStrings": [
-        "renovate-version: (?<currentValue>[0-9.]+)",
-        "renovate/renovate:(?<currentValue>[0-9.]+)"
-      ],
+      "managerFilePatterns": ["/^\\.github/workflows/renovate-config\\.yml$/"],
+      "matchStrings": ["renovate/renovate:(?<currentValue>[0-9.]+)"],
       "datasourceTemplate": "docker",
       "depNameTemplate": "renovate/renovate"
     }
@@ -66,7 +61,7 @@
     },
     {
       "matchPackageNames": ["renovate/renovate"],
-      "groupName": "Renovate runtime and validator"
+      "groupName": "Renovate config validator"
     }
   ],
   "minimumReleaseAge": "7 days",

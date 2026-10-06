@@ -126,4 +126,4 @@ Release Please aktualisiert bei jedem Push auf `main` einen Release-PR mit Versi
 
 ## Renovate
 
-Versionsupdates kommen montags zwischen 09:00 und 15:00 Uhr (Europe/Berlin) als Pull Requests. Nach erfolgreichen Checks merged Renovate automatisch. Konfiguration, Workflows und die noch erforderliche GitHub-Einrichtung sind in [docs/RENOVATE.md](docs/RENOVATE.md) beschrieben. Dafür ist das Repository-Secret `RENOVATE_TOKEN` nötig; es ist bisher nicht eingerichtet.
+Die Renovate GitHub App erstellt Versionsupdates montags zwischen 09:00 und 15:00 Uhr (Europe/Berlin) als Pull Requests und merged sie nach erfolgreichen Checks. Konfiguration, Validierungsworkflow und GitHub-Einrichtung sind in [docs/RENOVATE.md](docs/RENOVATE.md) beschrieben. Ein eigener Renovate-Bot-Workflow und das Repository-Secret `RENOVATE_TOKEN` sind dafür nicht erforderlich.

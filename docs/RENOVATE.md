@@ -1,38 +1,35 @@
 # Automatische Versionsupdates
 
+## Betrieb über die Renovate GitHub App
+
+Die zentral installierte Renovate GitHub App verwaltet r2dlan/LittleQuest. Die Konfiguration unter .github/renovate.json bleibt erhalten. Der zusätzliche Bot-Workflow wurde entfernt, damit nicht zwei Bots dieselben Updates und Dashboards bearbeiten. Die App verwendet eigene Zugangsdaten; RENOVATE_TOKEN wird nicht mehr benötigt. Release Please läuft unabhängig davon mit RELEASE_PLEASE_TOKEN weiter.
+
 ## Verhalten
 
 - Zeitzone: **Europe/Berlin**.
-- Neue Update-Branches und Pull Requests: **montags, 09:00 bis vor 15:00 Uhr**, inklusive automatischer Sommer-/Winterzeitumstellung.
-- Bestehende Renovate-Branches werden bei jedem Bot-Lauf auf den aktuellen Stand von `main` gebracht (`rebaseWhen: behind-base-branch`, `updateNotScheduled: true`). Dafür startet der Bot auch bei jedem Push auf `main`. Diese Aktualisierungen sind außerhalb des Montagfensters erlaubt; dabei können auch neuere, mindestens sieben Tage alte Versionen in bestehende Update-Branches aufgenommen werden. Neue Commits auf den PR-Branches lösen die jeweils passenden Checks erneut aus.
-- Eigene Commits auf Renovate-Branches können die automatische Aktualisierung verhindern. Bei Bedarf im PR die Rebase-/Retry-Checkbox aktivieren und den Renovate-Workflow manuell starten; dabei kann Renovate eigene Änderungen am Update-Branch verwerfen.
-- Renovate läuft stündlich um Minute 17 im passenden UTC-Fenster. GitHub kann geplante Läufe verzögern; die Renovate-Konfiguration setzt das lokale Zeitfenster durch. Dies ist kein garantierter Lauf exakt um 09:00 Uhr.
-- Neue Versionen werden erst berücksichtigt, wenn ihre Veröffentlichung mindestens **sieben Tage** zurückliegt. Fehlt ein verlässlicher Veröffentlichungszeitpunkt, wird die Version nicht automatisch freigegeben. Das betrifft das Alter der neuen Version, nicht das Alter der aktuell installierten Version.
-- Jede Aktualisierung kommt als Pull Request mit Conventional Commit, z. B. `chore(deps): update dependency …`.
-- Automerge gilt wie gewünscht auch für Major-Updates; jeder PR muss zuvor alle Statuschecks bestehen. Fehlerhafte oder noch laufende Checks verhindern das Merge.
-- Renovate merged selbst per Squash (`platformAutomerge: false`), statt einen ungeprüften nativen Auto-Merge zu aktivieren. Nach grünen PR-Prüfungen läuft der Bot erneut und kann mergen, auch außerhalb des Update-Zeitfensters. Er prüft dabei nochmals den aktuellen Zustand.
-- npm-Abhängigkeiten und Lockfile, GitHub Actions, Gradle-Plugins sowie die Gradle-Version werden gepflegt. Biome-Paket und Konfigurationsschema landen gemeinsam in einem PR.
+- Neue Update-Branches und Pull Requests: **montags, 09:00 bis vor 15:00 Uhr**, inklusive Sommer-/Winterzeitumstellung. Die App läuft nach ihrem eigenen Zeitplan; das Fenster erlaubt Updates, garantiert aber keinen Lauf zu einer bestimmten Minute.
+- Bestehende Renovate-Branches werden bei den App-Läufen auf den aktuellen Stand von main gebracht (rebaseWhen: behind-base-branch, updateNotScheduled: true). Diese Aktualisierungen sind auch außerhalb des Montagfensters erlaubt; dabei können neuere, mindestens sieben Tage alte Versionen in bestehende Update-Branches aufgenommen werden. Die passenden Checks laufen anschließend erneut. Es gibt keinen eigenen Workflow mehr, der Renovate bei jedem Push auf main startet.
+- Eigene Commits auf Renovate-Branches können die automatische Aktualisierung verhindern. Bei Bedarf im PR oder Dependency Dashboard die Rebase-/Retry-Checkbox aktivieren. Renovate kann dabei eigene Änderungen am Update-Branch verwerfen.
+- Neue Versionen müssen mindestens **sieben Tage** veröffentlicht sein. Ohne verlässlichen Veröffentlichungszeitpunkt erfolgt keine automatische Freigabe.
+- Jede Aktualisierung kommt als Pull Request mit Conventional Commit.
+- Automerge gilt auch für Major-Updates. Renovate merged selbst per Squash (platformAutomerge: false), sobald der PR aktuell und die Checks erfolgreich sind. Das erfolgt bei einem folgenden App-Lauf, auch außerhalb des Update-Zeitfensters; grüne Checks bedeuten keinen sofortigen Merge.
+- npm-Abhängigkeiten, Lockfile, GitHub Actions, Gradle-Plugins und die Gradle-Version werden gepflegt. Biome-Paket und Konfigurationsschema landen gemeinsam in einem PR. Die Docker-Version des Konfigurationsvalidators wird separat gepflegt; die Version der zentral betriebenen App wird nicht durch dieses Repository gesteuert.
 
-## Einmalig auf GitHub einrichten
+## GitHub-Einrichtung und Umstellung
 
-1. Diese Änderungen nach Freigabe auf den Default-Branch pushen.
-2. Ein dediziertes Bot-Konto oder einen geeigneten Personal Access Token für dieses Repository verwenden. Als Secret unter **Settings → Secrets and variables → Actions → New repository secret** den Namen **RENOVATE_TOKEN** hinterlegen. Den Token nicht in Dateien oder Chatnachrichten schreiben.
-3. Der Token braucht Lesezugriff auf Metadaten und Checks sowie Schreibrechte für Repository-Inhalte, Pull Requests und Issues (Dependency Dashboard). Für Aktualisierungen von Workflowdateien braucht er zusätzlich **Workflows: read and write**. Bei klassischen Tokens entsprechen dem `repo` und `workflow`. Organisationsfreigaben müssen ggf. durch einen Admin bestätigt werden.
-4. Beim Branch-Schutz für den Default-Branch **Validate Renovate configuration**, **Code quality and tests** und **Build Android APK** nicht pauschal als Pflichtchecks verlangen: Diese Workflows laufen abhängig von den geänderten Dateien. Andernfalls bleiben PRs ohne passende Änderungen beim Merge blockiert. Bereits konfigurierte Pflichtchecks müssen entsprechend angepasst werden; die Repository-Dateien ändern diese GitHub-Einstellung nicht. Renovate wartet weiterhin auf alle tatsächlich gestarteten Checks. Squash-Merges müssen erlaubt sein. Erforderliche manuelle Reviews können Automerge blockieren; solche Regeln nicht stillschweigend umgehen.
-5. Unter **Actions → Renovate → Run workflow** einen ersten Lauf starten. Außerhalb des Zeitfensters werden keine neuen Versionsupdates erstellt; bestehende grüne Update-PRs können gemerged werden.
+1. In der Installation der Renovate GitHub App Zugriff auf r2dlan/LittleQuest sicherstellen.
+2. Nach dem Push dieser Umstellung das vom persönlichen Benutzer erstellte **Dependency Dashboard** schließen. Das Dashboard von **renovate[bot]** behalten.
+3. Das Repository-Secret RENOVATE_TOKEN löschen, sofern es keine andere Verwendung hat. Falls derselbe zugrunde liegende Token auch als RELEASE_PLEASE_TOKEN verwendet wird, diesen Token nicht widerrufen und das Release-Please-Secret behalten.
+4. Vom persönlichen Bot erstellte offene Update-PRs prüfen. Duplikate zu App-PRs schließen; die App muss fremde PRs nicht übernehmen. Das Schließen des alten Dashboards allein beendet den eigenen Bot nicht — dafür wird der alte Workflow entfernt.
+5. Squash-Merges erlauben. **Validate Renovate configuration**, **Code quality and tests** und **Build Android APK** nicht pauschal als Pflichtchecks verlangen: Sie starten abhängig von den geänderten Dateien. Sonst blockieren fehlende Checks PRs ohne passende Änderungen. Renovate wartet weiterhin auf tatsächlich gestartete Checks; Review- und Branch-Regeln gelten zusätzlich.
 
-Das normale `GITHUB_TOKEN` wird nicht als Bot-Token verwendet: Damit erzeugte Änderungen starten die notwendigen PR-Workflows nicht zuverlässig. Die Workflows führen Code aus Update-PRs ohne Bot-Secret aus. Der Bot selbst verwendet immer die Konfiguration vom vertrauenswürdigen Default-Branch.
+Die Repository-Dateien ändern weder die App-Installation noch GitHub-Secrets, Dashboards oder Branch-Regeln automatisch.
 
-Solange Secret und Push fehlen, ist Renovate vorbereitet, aber nicht aktiv. GitHub-Einstellungen und Secrets werden durch die Dateien nicht automatisch gesetzt.
+## Validierung und Builds
 
-## Workflows
+- .github/workflows/renovate-config.yml: offizieller Validator bei Änderungen an .github/renovate.json oder am Validierungsworkflow; außerdem manuell startbar, ohne Bot-Token.
+- .github/workflows/check.yml: Biome, Tests, synchronisierte Android-Assets und signierte Test-APK bei App-/Buildänderungen, außerdem manuell und für Releases startbar.
 
-- `.github/workflows/renovate.yml`: Pushes auf `main` zum Aktualisieren bestehender PRs, Montagstermine, manueller Start und erneuter Lauf nach erfolgreichen Renovate-PR-Prüfungen.
-- `.github/workflows/renovate-config.yml`: offizieller Validator bei Pushes und Pull Requests mit Änderungen an `.github/renovate.json` oder einem der beiden Renovate-Workflows; ohne Bot-Token, außerdem manuell startbar. Reine App- oder Dokumentationsänderungen starten keine Renovate-Validierung.
-- `.github/workflows/check.yml`: Biome, Tests, synchronisierte Android-Assets und signierte Test-APK; automatisch nur bei App- oder Buildänderungen, außerdem manuell startbar.
+android/gradle-version.txt bleibt die gemeinsame Quelle für lokale und CI-Gradle-Versionen. Eine Veröffentlichung bei Google Play erfolgt nicht.
 
-`.github/renovate.json` enthält die Repository-Regeln. Die eingesetzte Renovate-Version ist festgelegt. `android/gradle-version.txt` ist die gemeinsame Quelle für die lokale und die CI-Gradle-Version. Die automatisierten Prüfungen müssen erfolgreich sein; notwendige Änderungen an Buildwerkzeugen werden andernfalls manuell im betreffenden Update-PR gelöst.
-
-Eine Veröffentlichung bei Google Play erfolgt weiterhin nicht.
-
-Referenzen: [Renovate-Zeitplanung](https://docs.renovatebot.com/key-concepts/scheduling/), [Automerge](https://docs.renovatebot.com/key-concepts/automerge/), [GitHub Action und Bot-Token](https://github.com/renovatebot/github-action).
+Referenzen: [Renovate GitHub App](https://docs.renovatebot.com/getting-started/installing-onboarding/), [Zeitplanung](https://docs.renovatebot.com/key-concepts/scheduling/), [Automerge](https://docs.renovatebot.com/key-concepts/automerge/).
