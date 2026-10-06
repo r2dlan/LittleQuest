@@ -9,6 +9,8 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/check.yml'
+      - '.github/workflows/release-please.yml'
+      - '.github/release-please-config.json'
       - '!**/*.md'
   pull_request:
     paths:
@@ -19,10 +21,20 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/check.yml'
+      - '.github/workflows/release-please.yml'
+      - '.github/release-please-config.json'
       - '!**/*.md'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+      artifact-name:
+        type: string
+        required: true
 concurrency:
-  group: android-${{ github.workflow }}-${{ github.ref }}
+  group: android-${{ github.workflow }}-${{ inputs.ref || github.ref }}
   cancel-in-progress: true
 permissions:
   contents: read
@@ -32,6 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -50,6 +64,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -78,7 +94,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: LittleQuest-Android-${{ github.run_number }}
+          name: ${{ inputs.artifact-name || format('LittleQuest-Android-{0}', github.run_number) }}
           path: dist/LittleQuest.apk
           if-no-files-found: error
           retention-days: 14

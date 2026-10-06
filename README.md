@@ -114,11 +114,15 @@ Codex bereitet am Feature-Ende eine passende Nachricht vor. Commit und Push erfo
 
 Der Workflow **Little Quest checks and APK** startet bei Pushes und Pull Requests nur für Änderungen unter `web/` oder `android/`, an `sync-android.mjs`, `scripts/build-android.sh`, `package.json`, `package-lock.json` oder am APK-Workflow selbst. Markdown-Dateien sind ausgeschlossen. Änderungen ausschließlich an Dokumentation, Agent-Anweisungen oder Renovate starten keinen APK-Build. Manuell lässt er sich weiterhin über **Actions → Little Quest checks and APK → Run workflow** starten. Zuerst laufen Biome, Spieltests und die Prüfung der Android-Assets. Nur danach wird mit Java 17, Gradle 8.9 und Android SDK 35 eine installierbare Debug-APK gebaut und ihre Signatur geprüft.
 
-Nach erfolgreichem Lauf unter **Actions → Lauf → Artifacts** das Archiv `LittleQuest-Android-<Laufnummer>` herunterladen und entpacken. Es enthält `LittleQuest.apk`. Die Downloads werden 14 Tage aufbewahrt. Es gibt keinen Google-Play-Upload und keine Veröffentlichung als Release; Store-Zugangsdaten sind nicht erforderlich.
+Nach erfolgreichem Lauf unter **Actions → Lauf → Artifacts** das Archiv `LittleQuest-Android-<Laufnummer>` herunterladen und entpacken. Es enthält `LittleQuest.apk`. Die Downloads werden 14 Tage aufbewahrt. Release Please veröffentlicht zusätzlich die APK als GitHub-Release-Download. Es gibt keinen Google-Play-Upload; Store-Zugangsdaten sind nicht erforderlich.
 
 GitHub baut auf jedem frischen Runner mit einem eigenen Debugschlüssel. Deshalb lassen sich diese Test-APKs nicht zuverlässig als Update über die lokal signierte App installieren. Eine bestehende Installation gegebenenfalls vorher deinstallieren (löscht ihren Spielstand). Ein dauerhafter Signaturschlüssel für Updates wird vor einer späteren Veröffentlichung separat eingerichtet.
 
 Die Pipeline wird erst nach Commit und Push auf GitHub ausgeführt. Lokal sind die Checks und der Android-Build geprüft; der erste GitHub-Lauf steht noch aus.
+
+## Releases
+
+Release Please aktualisiert bei jedem Push auf `main` einen Release-PR mit Version und Changelog. Nach dessen Merge entsteht ein GitHub-Release; die geprüfte APK des Release-Tags wird als Download angehängt. Einrichtung des Secrets `RELEASE_PLEASE_TOKEN`, Ablauf und Wiederholung eines Builds sind in [docs/RELEASES.md](docs/RELEASES.md) beschrieben.
 
 ## Renovate
 
