@@ -78,7 +78,8 @@ jobs:
           set -eu
           docker run --detach --name littlequest-test --publish 127.0.0.1:4173:4173 littlequest:local
           trap 'docker logs littlequest-test; docker rm --force littlequest-test' EXIT
-          curl --fail --retry 10 --retry-connrefused --retry-delay 1 http://127.0.0.1:4173/ --output /tmp/game.html
+          # Port forwarding can accept connections before Node is ready and then reset them.
+          curl --fail --retry 30 --retry-all-errors --retry-delay 1 --retry-max-time 45 --connect-timeout 2 --max-time 5 http://127.0.0.1:4173/ --output /tmp/game.html
           grep -q 'game.js' /tmp/game.html
           for file in game.js quest.js world.js settings.js sw.js privacy.html privacy-details.json; do
             curl --fail "http://127.0.0.1:4173/$file" --output /dev/null
