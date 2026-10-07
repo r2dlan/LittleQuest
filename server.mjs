@@ -3,7 +3,9 @@ import http from "node:http";
 import { extname, resolve } from "node:path";
 
 const root = resolve("web");
-http
+const host = process.env.HOST || "127.0.0.1";
+const port = Number(process.env.PORT || 4173);
+const server = http
   .createServer(async (req, res) => {
     try {
       const path = resolve(
@@ -23,6 +25,7 @@ http
           ".css": "text/css",
           ".js": "text/javascript",
           ".svg": "image/svg+xml",
+          ".json": "application/json",
           ".webmanifest": "application/manifest+json",
         }[extname(file)] || "application/octet-stream",
       );
@@ -32,6 +35,6 @@ http
       res.end("Nicht gefunden");
     }
   })
-  .listen(4173, "127.0.0.1", () =>
-    console.log("Little Quest: http://127.0.0.1:4173"),
-  );
+  .listen(port, host, () => {
+    console.log(`Little Quest: http://${host}:${server.address().port}`);
+  });

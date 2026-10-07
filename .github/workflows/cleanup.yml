@@ -1,0 +1,49 @@
+name: Keep last 10 releases and container versions
+on:
+  workflow_run:
+    workflows: ['Little Quest container', 'Release Please']
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Preview only; do not delete versions
+        type: boolean
+        default: true
+permissions:
+  contents: read
+concurrency:
+  group: github-version-cleanup
+  cancel-in-progress: false
+jobs:
+  cleanup:
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - name: Keep 10 published releases and 10 container digests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
+        run: |
+          if [ "$PREVIEW" = 'true' ]; then
+            node scripts/cleanup-github.mjs
+          else
+            node scripts/cleanup-github.mjs --apply
+          fi
