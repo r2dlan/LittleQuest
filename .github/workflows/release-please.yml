@@ -1,7 +1,8 @@
 name: Release Please
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       release-tag:
@@ -52,26 +53,21 @@ jobs:
           tag=$(gh release view "$RELEASE_TAG" --json tagName --jq .tagName)
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo 'created=true' >> "$GITHUB_OUTPUT"
-  apk:
-    needs: release
-    if: ${{ needs.release.outputs.created == 'true' }}
-    uses: ./.github/workflows/check.yml
-    with:
-      ref: ${{ needs.release.outputs.tag }}
-      artifact-name: LittleQuest-${{ needs.release.outputs.tag }}
   upload:
-    needs: [release, apk, container]
+    needs:
+      - release
+      - build
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: LittleQuest-${{ needs.release.outputs.tag }}
+          name: ${{ needs.build.outputs.android-artifact }}
           path: dist
       - uses: actions/download-artifact@v4
         with:
-          name: LittleQuest-Container-${{ needs.release.outputs.tag }}
+          name: ${{ needs.build.outputs.container-artifact }}
           path: dist
       - name: Attach tested Android files and container to GitHub release
         env:
@@ -79,15 +75,14 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ needs.release.outputs.tag }}
         run: gh release upload "$RELEASE_TAG" dist/LittleQuest.apk dist/LittleQuest-unsigned.aab dist/LittleQuest-container.tar.gz --clobber
-
-  container:
+  build:
     needs: release
     if: ${{ needs.release.outputs.created == 'true' }}
-    uses: ./.github/workflows/container.yml
+    uses: ./.github/workflows/check.yml
+    with:
+      ref: ${{ needs.release.outputs.tag }}
+      artifact-name: LittleQuest-${{ needs.release.outputs.tag }}
+      release-tag: ${{ needs.release.outputs.tag }}
     permissions:
       contents: read
       packages: write
-    with:
-      ref: ${{ needs.release.outputs.tag }}
-      artifact-name: LittleQuest-Container-${{ needs.release.outputs.tag }}
-      release-tag: ${{ needs.release.outputs.tag }}

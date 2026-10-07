@@ -18,7 +18,7 @@ Dann http://127.0.0.1:4173 öffnen. Es müssen keine Pakete installiert werden.
 
 GitHub-Releases und das Container-Package werden automatisch auf jeweils zehn Versionen begrenzt. Ältere Releases einschließlich ihrer Downloads und ältere Container-Versionen werden gelöscht; `latest` bleibt geschützt. Git-Tags bleiben erhalten. Details und die manuelle Vorschau stehen in [docs/RELEASES.md](docs/RELEASES.md).
 
-Der Workflow veröffentlicht erfolgreiche Builds auf `main` zusätzlich als GitHub-Package **`ghcr.io/r2dlan/littlequest:latest`**. Releases erhalten einen Versions-Tag wie `v0.3.0`; jeder veröffentlichte Build außerdem `sha-<Commit-ID>`. Pull Requests und andere Branches bauen und testen nur. Der Download als Container-Archiv bleibt verfügbar.
+Die gemeinsame App- und Container-Pipeline veröffentlicht erst nach beiden erfolgreichen Builds auf `main` zusätzlich als GitHub-Package **`ghcr.io/r2dlan/littlequest:latest`**. Releases erhalten einen Versions-Tag wie `v0.3.0`; jeder veröffentlichte Build außerdem `sha-<Commit-ID>`. Entwicklungs-Builds bekommen zusätzlich `v<Projektversion>-sha.<Commit-ID>`, damit sie keinen offiziellen Release-Tag überschreiben. Pull Requests und andere Branches bauen und testen nur. Der Download als Container-Archiv bleibt verfügbar.
 
 Nach der ersten Veröffentlichung die Sichtbarkeit unter **Organisation r2dlan → Packages → littlequest → Package settings** prüfen. Neue Container-Packages sind standardmäßig privat. Für Downloads ohne Anmeldung dort auf **Public** stellen; für ein privates Package bei `ghcr.io` mit einem GitHub-Token mit `read:packages` anmelden. Falls die Organisation Package-Erstellung einschränkt, diese für GitHub Actions erlauben. Zum Veröffentlichen nutzt der Workflow das vorhandene `GITHUB_TOKEN`; ein zusätzliches Secret ist nicht erforderlich.
 
@@ -30,7 +30,7 @@ docker run --detach --name littlequest --platform linux/amd64 --restart unless-s
 
 Dann http://127.0.0.1:4173 öffnen. Für einen bestimmten Release `latest` durch den gewünschten Versions-Tag ersetzen. `latest` folgt dem aktuellen getesteten Stand auf `main`; ein erneuter Build eines älteren Releases verändert diesen Tag nicht.
 
-Der Workflow **Little Quest container** baut und testet das Spiel als Docker-Image. Bei Änderungen an Webspiel, Server oder Container-Build entsteht unter **Actions → Lauf → Artifacts** ein Archiv `LittleQuest-Container-<Laufnummer>`. Reine Dokumentationsänderungen starten keinen Build. Bei neuen Releases ist `LittleQuest-container.tar.gz` auch als Release-Download verfügbar. Das Image ist für Linux/amd64 gebaut; Docker Desktop auf Apple Silicon kann es mit der angegebenen Plattform starten.
+Der Workflow **Little Quest app and container** baut Android-App und Docker-Image immer gemeinsam. Beide verwenden dieselbe Version aus `package.json` und denselben unveränderlichen Commit. Nach einer gemeinsamen Prüfung laufen die Builds parallel. Unter **Actions → Lauf → Artifacts** liegen `LittleQuest-v<Version>-<Commit>-Android` und `LittleQuest-v<Version>-<Commit>-Container`. Für Releases heißen die Archive `LittleQuest-v<Version>-Android` und `LittleQuest-v<Version>-Container`. Reine Dokumentationsänderungen starten keinen Build. Bei neuen Releases ist `LittleQuest-container.tar.gz` auch als Release-Download verfügbar. Das Image ist für Linux/amd64 gebaut; Docker Desktop auf Apple Silicon kann es mit der angegebenen Plattform starten.
 
 Nach Download und Entpacken des Workflow-Artefakts:
 
@@ -126,7 +126,7 @@ In VS Code die empfohlene Biome-Erweiterung installieren. Die Repository-Einstel
 
 Der Commit-Hook ist in diesem Checkout bereits aktiviert und prüft Biome sowie Tests. In weiteren Checkouts nach `npm ci` einmal `npm run hooks:install` ausführen. Der Hook verändert keine Dateien automatisch.
 
-Der GitHub-Workflow `.github/workflows/check.yml` prüft bei Pushes und Pull Requests mit Änderungen an App- oder Builddateien Biome, Tests und synchronisierte Android-Assets. Reine Dokumentationsänderungen starten diesen Workflow nicht. Repository-Regeln zum verpflichtenden Bestehen vor dem Merge sind noch nicht konfiguriert.
+Der GitHub-Workflow `.github/workflows/check.yml` prüft einmalig Biome, Tests, die gemeinsame Version und synchronisierte Android-Assets. Danach baut er Android-App und Container parallel. Änderungen an Spiel, Android, Server, Tests oder Builddateien lösen immer beide Builds aus. Reine Dokumentationsänderungen starten diese Pipeline nicht. Repository-Regeln zum verpflichtenden Bestehen vor dem Merge sind noch nicht konfiguriert; bestehende Regeln nach der Workflow-Umstellung auf die aktuellen Check-Namen prüfen.
 
 `AGENTS.md` verpflichtet auch zukünftige Arbeiten im Repository zu diesen Prüfungen. Generierte Android-Assets und lokale Buildwerkzeuge sind aus Biome ausgeschlossen; die Web-Quelldateien werden geprüft und anschließend synchronisiert.
 
@@ -146,11 +146,11 @@ docs(story): describe the lake quest
 
 Codex bereitet am Feature-Ende eine passende Nachricht vor. Commit und Push erfolgen erst nach deiner ausdrücklichen Freigabe für dieses Feature, zum Beispiel „Freigegeben, bitte committen und pushen.“
 
-## Android-APK auf GitHub bauen
+## App und Container auf GitHub bauen
 
-Der Workflow **Little Quest checks and APK** startet bei Pushes und Pull Requests nur für Änderungen unter `web/` oder `android/`, an `sync-android.mjs`, `scripts/build-android.sh`, `package.json`, `package-lock.json` oder am APK-Workflow selbst. Markdown-Dateien sind ausgeschlossen. Änderungen ausschließlich an Dokumentation, Agent-Anweisungen oder Renovate starten keinen APK-Build. Manuell lässt er sich weiterhin über **Actions → Little Quest checks and APK → Run workflow** starten. Zuerst laufen Biome, Spieltests und die Prüfung der Android-Assets. Nur danach wird mit Java 17, der festgelegten Gradle-Version und Android SDK 36 eine installierbare Debug-APK gebaut und ihre Signatur geprüft.
+Der Workflow **Little Quest app and container** startet für Änderungen an App-, Server-, Test- und Builddateien. Markdown-Dateien sind ausgeschlossen. Änderungen ausschließlich an Dokumentation, Agent-Anweisungen oder Renovate starten keinen Build. Manuell lässt er sich über **Actions → Little Quest app and container → Run workflow** starten. Nach der gemeinsamen Prüfung baut er mit Java 17, der festgelegten Gradle-Version und Android SDK 36 eine Debug-APK und ein unsigniertes AAB, prüft die APK-Signatur und baut/testet parallel das Container-Image.
 
-Nach erfolgreichem Lauf unter **Actions → Lauf → Artifacts** das Archiv `LittleQuest-Android-<Laufnummer>` herunterladen und entpacken. Es enthält `LittleQuest.apk`. Die Downloads werden 14 Tage aufbewahrt. Release Please veröffentlicht zusätzlich die APK als GitHub-Release-Download. Es gibt keinen Google-Play-Upload; Store-Zugangsdaten sind nicht erforderlich.
+Nach erfolgreichem Lauf unter **Actions → Lauf → Artifacts** das Archiv mit Endung `-Android` herunterladen und entpacken. Es enthält `LittleQuest.apk` und `LittleQuest-unsigned.aab`; das Archiv mit Endung `-Container` enthält das Docker-Image. Version und Commit stehen in beiden Artefaktnamen. Downloads werden 14 Tage aufbewahrt. Release Please veröffentlicht alle drei Dateien gemeinsam als Release-Downloads. Es gibt keinen Google-Play-Upload.
 
 GitHub baut auf jedem frischen Runner mit einem eigenen Debugschlüssel. Deshalb lassen sich diese Test-APKs nicht zuverlässig als Update über die lokal signierte App installieren. Eine bestehende Installation gegebenenfalls vorher deinstallieren (löscht ihren Spielstand). Ein dauerhafter Signaturschlüssel für Updates wird vor einer späteren Veröffentlichung separat eingerichtet.
 

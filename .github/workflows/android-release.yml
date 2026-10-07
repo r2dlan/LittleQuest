@@ -15,19 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ needs.build.outputs.revision }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
-      - run: npm ci
-      - run: npm run check
-      - run: npm test
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
@@ -60,3 +57,13 @@ jobs:
             dist/LittleQuest.aab
           if-no-files-found: error
           retention-days: 14
+    needs: build
+  build:
+    name: Build matching app and container
+    uses: ./.github/workflows/check.yml
+    permissions:
+      contents: read
+      packages: write
+    with:
+      ref: ${{ inputs.ref }}
+      artifact-name: LittleQuest-signed-preparation-${{ github.run_number }}

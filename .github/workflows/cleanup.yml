@@ -1,11 +1,15 @@
 name: Keep last 10 releases and container versions
 on:
   workflow_run:
-    workflows: ['Little Quest container', 'Release Please']
-    types: [completed]
-    branches: [main]
+    workflows:
+      - Little Quest app and container
+      - Release Please
+    types:
+      - completed
+    branches:
+      - main
   schedule:
-    - cron: '30 3 * * *'
+    - cron: 30 3 * * *
   workflow_dispatch:
     inputs:
       dry-run:
@@ -32,11 +36,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci
-      - run: npm run check
-      - run: npm test
+          node-version: "22"
       - name: Keep 10 published releases and 10 container digests
         env:
           GH_TOKEN: ${{ github.token }}
