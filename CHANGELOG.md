@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/r2dlan/LittleQuest/compare/v0.2.0...v0.3.0) (2026-10-06)
+
+
+### Features
+
+* **android:** prepare game and builds for Google Play ([de4a911](https://github.com/r2dlan/LittleQuest/commit/de4a9110a1a9d1de68db7bbce15be8916ab0193a))
+
+
+### Maintenance
+
+* merge release 0.2.0 from main ([9662537](https://github.com/r2dlan/LittleQuest/commit/96625371f9746e804f31b77dba9225868fae2dec))
+
 ## [0.2.0](https://github.com/r2dlan/LittleQuest/compare/v0.1.0...v0.2.0) (2026-10-06)
 
 
