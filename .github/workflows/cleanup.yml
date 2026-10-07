@@ -47,3 +47,6 @@ jobs:
           else
             node scripts/cleanup-github.mjs --apply
           fi
+    concurrency:
+      group: littlequest-package-mutations
+      cancel-in-progress: false

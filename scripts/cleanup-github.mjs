@@ -37,6 +37,7 @@ export function outdatedVersions(items, { keep = 10, packages = false } = {}) {
 
 export async function cleanup({
   request,
+  readManifest,
   repository,
   dryRun = true,
   log = console.log,
@@ -69,9 +70,14 @@ export async function cleanup({
   const releases = await list(`${repoPath}/releases`);
   const versions = await list(`${packagePath}/versions`, true);
   const oldReleases = outdatedVersions(releases);
-  const oldPackages = outdatedVersions(versions, { packages: true });
+  const manifests = new Map();
+  for (const version of versions) {
+    if (!readManifest) throw new Error("Container manifest reader is required");
+    manifests.set(version.name, await readManifest(version.name));
+  }
+  const oldPackages = outdatedPackages(versions, manifests);
   log(
-    `${dryRun ? "Preview" : "Cleanup"}: ${oldReleases.length} releases, ${oldPackages.length} container versions beyond retention 10.`,
+    `${dryRun ? "Preview" : "Cleanup"}: ${oldReleases.length} releases, ${oldPackages.length} container manifests beyond retention of 10 complete versions.`,
   );
   for (const release of oldReleases) {
     log(
@@ -95,6 +101,36 @@ export async function cleanup({
     );
     if (!dryRun) await request(path, { method: "DELETE" });
   }
+}
+
+export function outdatedPackages(versions, manifests, keep = 10) {
+  const referenced = new Set();
+  for (const version of versions) {
+    const manifest = manifests.get(version.name);
+    if (manifest?.schemaVersion !== 2)
+      throw new Error("Missing or invalid container manifest");
+    for (const child of manifest.manifests || []) referenced.add(child.digest);
+  }
+  // Count image indexes as versions; architecture manifests are their dependencies.
+  const roots = versions.filter((version) => !referenced.has(version.name));
+  const oldRoots = outdatedVersions(roots, { keep, packages: true });
+  const oldIds = new Set(oldRoots.map((version) => version.id));
+  const protectedDigests = new Set();
+  function protect(digest) {
+    if (protectedDigests.has(digest)) return;
+    protectedDigests.add(digest);
+    for (const child of manifests.get(digest)?.manifests || [])
+      protect(child.digest);
+  }
+  for (const root of roots) if (!oldIds.has(root.id)) protect(root.name);
+  // Delete old indexes first, then only dependencies unused by retained versions.
+  return [
+    ...oldRoots,
+    ...versions.filter(
+      (version) =>
+        referenced.has(version.name) && !protectedDigests.has(version.name),
+    ),
+  ];
 }
 
 if (
@@ -121,8 +157,47 @@ if (
       throw new Error(`GitHub ${method} ${path}: HTTP ${response.status}`);
     return response.status === 204 ? null : response.json();
   };
+  const registryName = (process.env.GITHUB_REPOSITORY || "").toLowerCase();
+  let registryToken;
+  const readManifest = async (digest) => {
+    if (!/^sha256:[a-f0-9]{64}$/.test(digest))
+      throw new Error("Invalid container digest");
+    if (!registryToken) {
+      const auth = Buffer.from(`${process.env.GITHUB_ACTOR}:${token}`).toString(
+        "base64",
+      );
+      const response = await fetch(
+        `https://ghcr.io/token?service=ghcr.io&scope=${encodeURIComponent(`repository:${registryName}:pull`)}`,
+        {
+          headers: { Authorization: `Basic ${auth}` },
+          signal: AbortSignal.timeout(30000),
+        },
+      );
+      if (!response.ok)
+        throw new Error(
+          `Container registry authentication: HTTP ${response.status}`,
+        );
+      registryToken = (await response.json()).token;
+      if (!registryToken) throw new Error("Container registry token missing");
+    }
+    const response = await fetch(
+      `https://ghcr.io/v2/${registryName}/manifests/${digest}`,
+      {
+        headers: {
+          Authorization: `Bearer ${registryToken}`,
+          Accept:
+            "application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json",
+        },
+        signal: AbortSignal.timeout(30000),
+      },
+    );
+    if (!response.ok)
+      throw new Error(`Container manifest ${digest}: HTTP ${response.status}`);
+    return response.json();
+  };
   await cleanup({
     request,
+    readManifest,
     repository: process.env.GITHUB_REPOSITORY || "",
     dryRun: !process.argv.includes("--apply"),
   });

@@ -151,28 +151,55 @@ jobs:
   container:
     name: Build and test playable container
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.check.outputs.revision }}
           persist-credentials: false
-      - name: Build image
-        env:
-          SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
-          REVISION: ${{ needs.check.outputs.revision }}
-          APP_VERSION: ${{ needs.check.outputs.version }}
-        run: docker build --label "org.opencontainers.image.source=$SOURCE_URL" --label "org.opencontainers.image.revision=$REVISION" --label "org.opencontainers.image.version=$APP_VERSION" --tag littlequest:local .
-      - name: Verify container serves game and privacy files
+      - name: Enable multi-platform Docker image storage
+        uses: docker/setup-docker-action@v5
+        with:
+          daemon-config: '{"features":{"containerd-snapshotter":true}}'
+      - name: Enable ARM64 execution
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: arm64
+      - name: Set up multi-platform builder
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker
+      - name: Build both platforms from shared revision
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          load: true
+          push: false
+          provenance: false
+          sbom: false
+          tags: littlequest:local
+          labels: |-
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ needs.check.outputs.revision }}
+            org.opencontainers.image.version=${{ needs.check.outputs.version }}
+      - name: Verify gameplay and privacy files on both platforms
         run: |
           set -eu
-          docker run --detach --name littlequest-test --publish 127.0.0.1:4173:4173 littlequest:local
-          trap 'docker logs littlequest-test; docker rm --force littlequest-test' EXIT
-          # Port forwarding can accept connections before Node is ready and then reset them.
-          curl --fail --retry 30 --retry-all-errors --retry-delay 1 --retry-max-time 45 --connect-timeout 2 --max-time 5 http://127.0.0.1:4173/ --output /tmp/game.html
-          grep -q 'game.js' /tmp/game.html
-          for file in game.js quest.js world.js settings.js sw.js privacy.html privacy-details.json; do
-            curl --fail "http://127.0.0.1:4173/$file" --output /dev/null
+          trap 'docker logs littlequest-test 2>/dev/null || true; docker rm --force littlequest-test 2>/dev/null || true' EXIT
+          for platform in linux/amd64 linux/arm64; do
+            docker run --detach --platform "$platform" --name littlequest-test --publish 127.0.0.1:4173:4173 littlequest:local
+            # Port forwarding may reset connections while Node starts.
+            curl --fail --retry 30 --retry-all-errors --retry-delay 1 --retry-max-time 45 --connect-timeout 2 --max-time 5 http://127.0.0.1:4173/ --output /tmp/game.html
+            grep -q 'game.js' /tmp/game.html
+            expected_arch=x64
+            if [ "$platform" = linux/arm64 ]; then expected_arch=arm64; fi
+            test "$(docker exec littlequest-test node -p process.arch)" = "$expected_arch"
+            for file in game.js quest.js world.js settings.js sw.js privacy.html privacy-details.json; do
+              curl --fail "http://127.0.0.1:4173/$file" --output /dev/null
+            done
+            docker logs littlequest-test
+            docker rm --force littlequest-test
           done
       - name: Export startable Docker image
         run: |
@@ -200,6 +227,11 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Enable multi-platform Docker image storage
+        uses: docker/setup-docker-action@v5
+        with:
+          daemon-config: '{"features":{"containerd-snapshotter":true}}'
+      - uses: docker/setup-buildx-action@v4
       - uses: actions/download-artifact@v4
         with:
           name: ${{ needs.check.outputs.container-artifact }}
@@ -238,3 +270,8 @@ jobs:
           if [ -z "$RELEASE_TAG" ]; then
             docker push "$IMAGE:latest"
           fi
+      - name: Verify published multi-platform index
+        run: docker buildx imagetools inspect --raw "$IMAGE:$IMAGE_TAG" | node --input-type=module -e 'import assert from "node:assert/strict"; let raw = ""; for await (const chunk of process.stdin) raw += chunk; const index = JSON.parse(raw); const platforms = index.manifests.map(m => `${m.platform.os}/${m.platform.architecture}`).sort(); assert.deepEqual(platforms, ["linux/amd64", "linux/arm64"]);'
+    concurrency:
+      group: littlequest-package-mutations
+      cancel-in-progress: false
