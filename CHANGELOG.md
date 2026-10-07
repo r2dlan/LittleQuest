@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.2](https://github.com/r2dlan/LittleQuest/compare/v0.4.1...v0.4.2) (2026-10-07)
+
+
+### CI
+
+* **actions:** update checkout and setup-node to Node 24 runtime ([076ebb4](https://github.com/r2dlan/LittleQuest/commit/076ebb4e10fb6b0065709969e0a59b7226024c43))
+
+
+### Maintenance
+
+* merge release 0.4.1 from main ([01e37b2](https://github.com/r2dlan/LittleQuest/commit/01e37b26eb82d58013490badf2fd774fe4f3529a))
+
 ## [0.4.1](https://github.com/r2dlan/LittleQuest/compare/v0.4.0...v0.4.1) (2026-10-07)
 
 
