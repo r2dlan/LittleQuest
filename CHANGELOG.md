@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/r2dlan/LittleQuest/compare/v0.4.2...v0.5.0) (2026-10-07)
+
+
+### Features
+
+* **container:** support amd64 and arm64 images with safe retention ([85093d1](https://github.com/r2dlan/LittleQuest/commit/85093d17c091759896ef8a492693b1c02fa51925))
+
+
+### Maintenance
+
+* merge release 0.4.2 from main ([ad19e4b](https://github.com/r2dlan/LittleQuest/commit/ad19e4bac7947f364645bf0c580345de906ab702))
+
 ## [0.4.2](https://github.com/r2dlan/LittleQuest/compare/v0.4.1...v0.4.2) (2026-10-07)
 
 
