@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.1](https://github.com/r2dlan/LittleQuest/compare/v0.5.0...v0.5.1) (2026-10-07)
+
+
+### CI
+
+* **pages:** deploy released game to Cloudflare Pages ([d2a959f](https://github.com/r2dlan/LittleQuest/commit/d2a959f3719d353e863445592c42c6724faa6903))
+
+
+### Maintenance
+
+* merge release 0.5.0 from main ([1a1716c](https://github.com/r2dlan/LittleQuest/commit/1a1716c4d69393555a353c575d036b7df19eda43))
+
 ## [0.5.0](https://github.com/r2dlan/LittleQuest/compare/v0.4.2...v0.5.0) (2026-10-07)
 
 
