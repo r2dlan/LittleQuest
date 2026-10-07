@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.1](https://github.com/r2dlan/LittleQuest/compare/v0.4.0...v0.4.1) (2026-10-07)
+
+
+### CI
+
+* **build:** build app and container from one versioned revision ([a047643](https://github.com/r2dlan/LittleQuest/commit/a047643732db2292650d09c0e232f0a2782475f2))
+
+
+### Maintenance
+
+* merge release 0.4.0 from main ([6a6ee96](https://github.com/r2dlan/LittleQuest/commit/6a6ee96b9d8ed4d46e0da8b7762809a36f6a9967))
+
 ## [0.4.0](https://github.com/r2dlan/LittleQuest/compare/v0.3.0...v0.4.0) (2026-10-07)
 
 
