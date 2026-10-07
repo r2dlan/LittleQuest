@@ -20,6 +20,7 @@ on:
       - .github/workflows/cleanup.yml
       - biome.json
       - scripts/build-metadata.mjs
+      - scripts/prepare-pages.mjs
       - '!**/*.md'
   pull_request:
     paths:
@@ -41,6 +42,7 @@ on:
       - .github/workflows/cleanup.yml
       - biome.json
       - scripts/build-metadata.mjs
+      - scripts/prepare-pages.mjs
       - '!**/*.md'
   workflow_dispatch: null
   workflow_call:

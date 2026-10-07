@@ -9,6 +9,11 @@ on:
         description: Existing release tag to rebuild APK, AAB and container (optional)
         type: string
         required: false
+      deploy-pages:
+        description: Also deploy the selected release to Cloudflare production (may roll back the site)
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -86,3 +91,53 @@ jobs:
     permissions:
       contents: read
       packages: write
+  pages:
+    name: Deploy released game to Cloudflare Pages
+    needs:
+      - release
+      - build
+      - upload
+    if: ${{ needs.release.outputs.created == 'true' && github.ref == 'refs/heads/main' && (!inputs.release-tag || inputs.deploy-pages) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      deployments: write
+    environment:
+      name: cloudflare-pages
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+      - name: Check Cloudflare configuration
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -eu
+          : "${CLOUDFLARE_API_TOKEN:?Configure repository secret CLOUDFLARE_API_TOKEN}"
+          : "${CLOUDFLARE_ACCOUNT_ID:?Configure repository secret CLOUDFLARE_ACCOUNT_ID}"
+          : "${CLOUDFLARE_PAGES_PROJECT:?Configure Pages project name}"
+          printf '%s' "$CLOUDFLARE_PAGES_PROJECT" | grep -Eq '^[a-z0-9][a-z0-9-]*$'
+          printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | grep -Eq '^[a-fA-F0-9]{32}$'
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.build.outputs.revision }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          package-manager-cache: false
+      - name: Prepare exact release assets and offline cache
+        env:
+          BUILD_RELEASE_TAG: ${{ needs.release.outputs.tag }}
+        run: node scripts/prepare-pages.mjs
+      - name: Publish production release
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          gitHubToken: ${{ github.token }}
+          wranglerVersion: 4.148.0
+          command: pages deploy dist/pages --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT }} --branch=main --commit-hash=${{ needs.build.outputs.revision }} --commit-message=${{ needs.release.outputs.tag }} --commit-dirty=false
+    env:
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'littlequest' }}

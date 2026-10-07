@@ -53,6 +53,12 @@ Für Google Play stehen ein gesonderter manueller signierter Build und die [Sign
 
 Auch der manuelle signierte Android-Workflow baut zunächst das passende Android-/Container-Paar und signiert danach die Android-Version desselben Commits. Dieser vorbereitende Build veröffentlicht kein Package. Die tägliche Bereinigung führt ausschließlich das bereits geprüfte Bereinigungsskript aus; sie installiert keine Entwicklungspakete und wiederholt keine Spieltests.
 
+## Cloudflare Pages
+
+Nach einem neuen Release und erfolgreichen Builds veröffentlicht ein nachgelagerter Job die Webversion desselben Commits auf Cloudflare Pages. Er wartet auf die Release-Downloads und verwendet die GitHub-Secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` sowie den voreingestellten Projektnamen `littlequest` (optional überschreibbar mit `CLOUDFLARE_PAGES_PROJECT`). Ohne Konfiguration meldet der Deployment-Job einen Fehler; die bereits erstellten Release-Pakete bleiben erhalten. Ein normaler Push oder Pull Request führt kein Pages-Deployment aus.
+
+Beim manuellen Wiederaufbau eines vorhandenen Release-Tags wird die Website nur mit aktivierter Option `deploy-pages` veröffentlicht. Diese Option kann bei einem alten Tag einen bewussten Rollback auslösen. Einrichtung, Offline-Cache und Wiederholung stehen in [CLOUDFLARE.md](CLOUDFLARE.md).
+
 ## Mehrere Container-Plattformen
 
 Der gemeinsame Build erstellt `linux/amd64` und `linux/arm64`, lädt beide Varianten in den containerd-Image-Store und prüft jeweils Server und Spieldateien. ARM64 wird auf dem Build-Runner mit QEMU ausgeführt. Erst nach beiden Plattformtests und erfolgreichem Android-Build wird genau dieses getestete Image veröffentlicht. Die Pipeline prüft anschließend den öffentlichen Image-Index auf beide Plattformen. Zusätzliche Provenance-/SBOM-Manifeste sind für diesen Build deaktiviert. Die zehn behaltenen Package-Versionen umfassen ihre referenzierten Plattform-Images; Bereinigung und Veröffentlichung werden gegeneinander serialisiert.
