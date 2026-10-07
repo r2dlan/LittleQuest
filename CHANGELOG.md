@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0](https://github.com/r2dlan/LittleQuest/compare/v0.3.0...v0.4.0) (2026-10-07)
+
+
+### Features
+
+* **container:** publish game image and retain ten versions ([46480f3](https://github.com/r2dlan/LittleQuest/commit/46480f315aaec6c8553e952984fbe0a6b02f2e83))
+
+
+### Bug Fixes
+
+* **ci:** retry connection resets during container startup ([ce191c7](https://github.com/r2dlan/LittleQuest/commit/ce191c76870a50bc55c6bcae8608c84ca4f71e6c))
+
+
+### Maintenance
+
+* merge release 0.3.0 from main ([a42ac90](https://github.com/r2dlan/LittleQuest/commit/a42ac90e4a629b7cd0cb99734b324dcaed44f61e))
+
 ## [0.3.0](https://github.com/r2dlan/LittleQuest/compare/v0.2.0...v0.3.0) (2026-10-06)
 
 
