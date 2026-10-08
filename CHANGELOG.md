@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.2](https://github.com/r2dlan/LittleQuest/compare/v0.5.1...v0.5.2) (2026-10-08)
+
+
+### Bug Fixes
+
+* **controls:** confirm dialogues with space ([40b8791](https://github.com/r2dlan/LittleQuest/commit/40b8791cb363fa246871aacffdabc04f66de6465))
+
+
+### Documentation
+
+* add public browser game URL ([e31c9cf](https://github.com/r2dlan/LittleQuest/commit/e31c9cf5355ff3d4c50be68f0e725b167b241488))
+
+
+### Maintenance
+
+* merge release 0.5.1 from main ([fc5abbf](https://github.com/r2dlan/LittleQuest/commit/fc5abbf66fa4675e9bfa7f43fc33cb2888c11dde))
+
 ## [0.5.1](https://github.com/r2dlan/LittleQuest/compare/v0.5.0...v0.5.1) (2026-10-07)
 
 
