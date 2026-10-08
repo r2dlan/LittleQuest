@@ -1,4 +1,4 @@
-const CACHE = "littlequest-v7";
+const CACHE = "littlequest-v8";
 const FILES = [
   "./",
   "./index.html",

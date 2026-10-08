@@ -75,6 +75,30 @@ function boot(saved, savedSettings) {
 const advance = (d, seconds) => {
   for (let i = 0; i < seconds * 60; i++) d.update(1 / 60);
 };
+test("Space confirms dialogue once, prevents scrolling and ignores held keys", () => {
+  const { d, e, events } = boot();
+  Object.assign(d.p, world.places.jona);
+  d.interact();
+  let prevented = 0;
+  const press = (repeat = false) =>
+    events.keydown({
+      code: "Space",
+      key: " ",
+      repeat,
+      target: { closest: () => null },
+      preventDefault: () => prevented++,
+    });
+  press(true);
+  assert.equal(e("dialog").hidden, false);
+  assert.equal(d.getState().accepted, false);
+  press();
+  assert.equal(e("dialog").hidden, true);
+  assert.equal(d.getState().accepted, true);
+  assert.equal(d.keys.has("interact"), false);
+  assert.equal(prevented, 2);
+  press(true);
+  assert.equal(e("dialog").hidden, true);
+});
 test("Top-down quest integration: both stories, interactions and saved ending", () => {
   const { d, e, memory } = boot();
   Object.assign(d.p, { x: 1230, y: 540 });

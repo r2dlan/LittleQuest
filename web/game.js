@@ -337,6 +337,15 @@ addEventListener("keydown", (e) => {
     togglePause();
     return;
   }
+  if (
+    (e.code === "Space" || e.key === " ") &&
+    !$("dialog").hidden &&
+    !e.target?.closest?.("input, a, select, textarea")
+  ) {
+    e.preventDefault();
+    if (!e.repeat) $("dialogNext").onclick();
+    return;
+  }
   if (e.target?.closest?.("input, button, a, select, textarea")) return;
   const k = mapping[e.key];
   if (k) {
