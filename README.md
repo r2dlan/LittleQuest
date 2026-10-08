@@ -1,6 +1,6 @@
 # Little Quest
 
-Ein gemütliches 2D-Abenteuer in Draufsicht für Spieler ab 6 Jahren. Erkunde das Dorf und den Wald, hilf beim Reparieren einer Brücke und entdecke das Geheimnis der alten Wassermaschine.
+Ein gemütliches 2D-Abenteuer in Draufsicht für Spieler ab 6 Jahren. Suche deinen Bruder: Die Reise führt von deinem Zuhause durch Dorf, Wald, Berge, Schnee, Wiesen und Wüste bis zum Strand. Die neue Reise ist zunächst eine frei erkundbare Landschaftsvorschau; Aufgaben folgen später.
 
 ## Im Browser spielen
 

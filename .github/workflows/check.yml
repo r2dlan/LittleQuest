@@ -197,7 +197,7 @@ jobs:
             expected_arch=x64
             if [ "$platform" = linux/arm64 ]; then expected_arch=arm64; fi
             test "$(docker exec littlequest-test node -p process.arch)" = "$expected_arch"
-            for file in game.js quest.js world.js settings.js sw.js privacy.html privacy-details.json; do
+            for file in journey-game.js journey-world.js characters.js camels.js wildlife.js beach.js assets/characters-beach.png assets/brother-beach.png assets/wildlife.png assets/camels.png assets/characters-b.png assets/characters-desert.png assets/characters-snow.png game.js quest.js world.js settings.js sw.js privacy.html privacy-details.json; do
               curl --fail "http://127.0.0.1:4173/$file" --output /dev/null
             done
             docker logs littlequest-test

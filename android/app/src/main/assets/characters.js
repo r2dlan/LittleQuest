@@ -15,10 +15,65 @@ const frames = {
     right: [526, 814, 214, 407],
     up: [911, 813, 200, 408],
   },
+  desertMan: {
+    down: [90, 55, 280, 558],
+    right: [491, 55, 265, 558],
+    up: [890, 55, 280, 558],
+  },
+  desertWoman: {
+    down: [98, 655, 275, 562],
+    right: [496, 655, 270, 562],
+    up: [886, 655, 282, 562],
+  },
+  snowManOutdoor: {
+    down: [120, 14, 220, 384],
+    right: [451, 20, 199, 378],
+    up: [752, 14, 221, 384],
+  },
+  snowWomanOutdoor: {
+    down: [115, 399, 224, 389],
+    right: [449, 402, 203, 386],
+    up: [748, 399, 229, 389],
+  },
+  snowManIndoor: {
+    down: [137, 792, 191, 333],
+    right: [462, 792, 173, 333],
+    up: [760, 792, 193, 333],
+  },
+  snowWomanIndoor: {
+    down: [138, 1126, 187, 311],
+    right: [451, 1126, 185, 311],
+    up: [765, 1126, 189, 311],
+  },
+  beachMan: {
+    down: [110, 40, 260, 545],
+    right: [507, 40, 260, 545],
+    up: [889, 40, 270, 545],
+  },
+  beachWoman: {
+    down: [53, 639, 365, 585],
+    right: [464, 639, 342, 585],
+    up: [844, 639, 363, 585],
+  },
 };
 const atlas = typeof Image === "undefined" ? null : new Image();
 if (atlas)
   atlas.src = new URL("./assets/characters-b.png", import.meta.url).href;
+const desertAtlas = typeof Image === "undefined" ? null : new Image();
+if (desertAtlas)
+  desertAtlas.src = new URL(
+    "./assets/characters-desert.png",
+    import.meta.url,
+  ).href;
+const snowAtlas = typeof Image === "undefined" ? null : new Image();
+if (snowAtlas)
+  snowAtlas.src = new URL("./assets/characters-snow.png", import.meta.url).href;
+const beachAtlas = typeof Image === "undefined" ? null : new Image();
+if (beachAtlas)
+  beachAtlas.src = new URL(
+    "./assets/characters-beach.png",
+    import.meta.url,
+  ).href;
 
 export function characterFrame(role = "hero", face = "down") {
   const palette = frames[role] ?? frames.mina;
@@ -30,12 +85,23 @@ export function characterFrame(role = "hero", face = "down") {
 export function drawCharacter(
   ctx,
   { x, y, face = "down", role = "hero", walking = false, time = 0 },
-  image = atlas,
+  image = role.startsWith("beach")
+    ? beachAtlas
+    : role.startsWith("snow")
+      ? snowAtlas
+      : role.startsWith("desert")
+        ? desertAtlas
+        : atlas,
 ) {
   if (!image?.complete || !image.naturalWidth) return;
   const frame = characterFrame(role, face);
-  const width = Math.round(frame.width * 0.15);
-  const height = Math.round(frame.height * 0.15);
+  const scale = role.startsWith("snow")
+    ? (role.endsWith("Outdoor") ? 57 : 52) / frame.height
+    : role.startsWith("desert") || role.startsWith("beach")
+      ? 0.1
+      : 0.15;
+  const width = Math.round(frame.width * scale);
+  const height = Math.round(frame.height * scale);
   const stride = walking ? Math.round(Math.sin(time * 12) * 2) : 0;
   const bob = walking ? Math.abs(stride) % 2 : 0;
   ctx.save();

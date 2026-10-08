@@ -1,62 +1,50 @@
-# Little Quest – Story und Aufgaben
+# Little Quest – Die Suche nach deinem Bruder
 
-Diese Übersicht ist der Einstieg für neue Geschichten. Jede Quest bekommt eine eigene Datei in `docs/quests/`. Das ursprüngliche `GAME_CONCEPT.md` beschreibt die Vision; die Questdateien beschreiben den aktuellen Entwurf und die tatsächlich umgesetzten Aufgaben.
+Du startest in deinem Zuhause und suchst deinen Bruder. Dein Freund im Dorf kennt seine Spur. Die Reise führt durch Wald, über Berge und Schnee, durch Wiesen und Wüste und endet am Strand: Dein Bruder liegt dort und sonnt sich.
 
-## Aktueller Rahmen
+## Aktueller Spielstand
 
-Little Quest ist ein gemütliches Abenteuer in 2D-Draufsicht. Kleine Geschichten verbinden Dorf, Wald, Höhle und See. Gespräche, Gegenstände und Umgebungsrätsel stehen im Mittelpunkt. Aufgaben sollen kurze Spielsitzungen ermöglichen und die Welt sichtbar verändern. Entwürfe verwenden die aktuelle Bewegung in vier Richtungen; neue Fähigkeiten werden ausdrücklich als Erweiterung beschrieben.
+Die 14 Landschaftsstationen bilden einen durchgehend begehbaren Weg. Aufgaben, Reparaturen, Dialoge und Freischaltungen sind noch nicht implementiert. Brücke und Leiter sind für die Vorschau offen. Häuser lassen sich betreten; Bewohner bewegen sich ohne Gespräche. Der Bruder liegt als Kulisse am Strand.
 
-## Questübersicht
+Bodenfarben, Wege und Pflanzen verändern sich schrittweise. Die Kamera folgt der Figur ohne Ladebildschirm zwischen Landschaften. Zurückgehen ist jederzeit möglich. Ein separater Spielstand `littlequest-journey-v1` speichert die Position dieser Reise; der bisherige Prototyp-Spielstand `littlequest-v1` bleibt erhalten. Beim ersten Start der neuen Route beginnt die Figur zu Hause.
 
-| ID | Titel | Gebiet | Voraussetzung | Status | Datei |
-| --- | --- | --- | --- | --- | --- |
-| Q001 | Die kaputte Brücke | Dorf / Wald | Spielbeginn | Umgesetzt | [Q001](quests/Q001-die-kaputte-bruecke.md) |
-| Q002 | Die alte Wassermaschine | Höhle | Q001: Brücke repariert | Umgesetzt | [Q002](quests/Q002-die-alte-wassermaschine.md) |
+## Die 14 Stationen
 
-Nächste freie ID: **Q003**. IDs bleiben bestehen, auch wenn Titel oder Reihenfolge sich ändern. Neue Aufgaben müssen nicht zwingend auf die vorige folgen: Nebenquests können z. B. nach Q001 im Dorf beginnen.
+Der Bergaufstieg in S04 ist eine echte Höhenstufe: Die Felswand ist gesperrt, nur die Leiter verbindet den unteren Waldweg mit dem oberen Bergweg. Auf der Leiter nach oben bzw. unten laufen oder wischen; erst oben seitlich weitergehen. Der Rückweg funktioniert ebenfalls. Alte Vorschaupositionen in der neuen Felswand werden auf einen sicheren Weg versetzt.
 
-Status: **Idee → Ausgearbeitet → In Umsetzung → Umgesetzt**. „Ausgearbeitet“ heißt, dass die Geschichte beschrieben ist, nicht dass sie bereits gebaut wurde.
+| ID | Gebiet | Status | Datei |
+| --- | --- | --- | --- |
+| S01 | Heimat | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S01-heimat.md) |
+| S02 | Dorf | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S02-dorf.md) |
+| S03 | Wald · Die Brücke | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S03-wald-bruecke.md) |
+| S04 | Wald · Der Aufstieg | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S04-wald-aufstieg.md) |
+| S05 | Bergpfad | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S05-bergpfad.md) |
+| S06 | Schneehöhen | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S06-schneehoehen.md) |
+| S07 | Schneestadt | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S07-schneestadt.md) |
+| S08 | Abstieg | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S08-abstieg.md) |
+| S09 | Weite Wiesen | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S09-wiesen.md) |
+| S10 | Wüstenrand | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S10-wuestenrand.md) |
+| S11 | Wüstenstadt | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S11-wuestenstadt.md) |
+| S12 | Grüne Rückkehr | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S12-gruene-rueckkehr.md) |
+| S13 | Wiesendorf | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S13-wiesendorf.md) |
+| S14 | Strand | Landschaft umgesetzt, Aufgaben geplant/offen | [Station](quests/S14-strand.md) |
 
-## Neue Aufgabe hinzufügen
+## Mehrere Aufgaben je Station
 
-1. `quests/QUEST_TEMPLATE.md` kopieren, z. B. als `quests/Q003-der-vermisste-hund.md`.
-2. Zunächst Titel, Idee, Startbedingung, Ablauf und Veränderung der Welt ausfüllen. Ungeklärte Dinge ausdrücklich als offen markieren.
-3. Die Aufgabe mit Status „Idee“ oder „Ausgearbeitet“ in die Tabelle aufnehmen und die nächste freie ID erhöhen.
-4. Zur Umsetzung im Chat schreiben: „Setze Q003 aus docs/quests/Q003-der-vermisste-hund.md um.“
-5. Nach Umsetzung Beschreibung mit dem Ergebnis abgleichen und Status aktualisieren. Spielfortschritt, Rückkehr ins Gebiet und bestehende Spielstände prüfen.
+Eine Station ist ein Gebiet und ein Storyabschnitt, keine einzelne Aufgabe. In ihrer Datei können beliebig viele Aufgaben mit stabilen IDs wie `S03-A01` und `S03-A02` definiert werden. Nummern nicht wiederverwenden. Jede Aufgabe beschreibt Voraussetzungen, Ziele, Hinweise, Abschluss, gespeicherte Veränderungen und Sonderfälle. Für ausgelagerte Aufgaben kann später eine Datei `S03-A01-holz-sammeln.md` angelegt und aus der Station verlinkt werden.
 
-Du kannst auch einfach im Chat eine Geschichte erzählen. Daraus können wir eine Questdatei erstellen, bevor sie umgesetzt wird. Nicht jedes Feld muss von dir ausgefüllt werden.
+1. Passende Stationsdatei öffnen.
+2. Nächste freie Aufgaben-ID bestimmen.
+3. [Aufgaben-Vorlage](quests/TASK_TEMPLATE.md) als neuen Abschnitt einfügen.
+4. Reihenfolge, optionale Ziele und Abhängigkeiten ausdrücklich festhalten.
+5. Erst nach Implementierung und Prüfung den Status auf „Umgesetzt“ ändern.
 
-## Orientierung für gute kleine Geschichten
+Statusfolge: **Idee → Ausgearbeitet → In Umsetzung → Umgesetzt**. Der Landschaftsstatus wird getrennt davon geführt.
 
-- Eine klare Motivation: Wem helfen wir, und warum?
-- Drei bis fünf verständliche Schritte; eine aktive Hauptaufgabe zur Zeit.
-- Eine kleine Besonderheit statt nur noch mehr Sammelobjekte.
-- Ein Hinweis, wenn der Spieler nicht weiterkommt.
-- Eine sichtbare, dauerhaft gespeicherte Veränderung.
-- Kein endgültiges Scheitern durch falsche Reihenfolge oder verbrauchte Gegenstände.
+## Technische Zuordnung
 
-## Figuren und Orte
+`web/journey-world.js` definiert Gebiete, Übergangsfarben, den durchgehenden Weg und begehbare Geometrie. `web/journey-game.js` ist der aktive Spieleinstieg. Die Figuren verwenden die [Stil-B-Sprites](GRAPHICS.md). Questdaten werden später anhand der Stations- und Aufgaben-IDs ergänzt.
 
-Die menschlichen Figuren verwenden den ausgewählten Stil B: detaillierte Pixelgrafik mit großen ausdrucksstarken Gesichtern, Lichtdetails und erdigen Kleidungsfarben. Die Spielfigur trägt einen roten Rucksack, Jona eine Handwerkerschürze und einen grauen Bart, Mina einen Haarknoten. Hausbewohner nutzen passende Varianten. Die transparenten Sprites in `web/assets/characters-b.png` wurden mit Imagegen direkt aus der freigegebenen B-Vorlage erstellt: drei Figuren mit Vorder-, Seiten- und Rückansichten. `web/characters.js` zeichnet die passenden Ausschnitte; links wird die Seitenansicht gespiegelt. Beim Laufen bewegen sich die Füße abwechselnd, bei „Weniger Bewegung“ bleiben die Figuren ruhig. Das Bild wird für Offline-Spiel und Android mitgeliefert.
+## Frühere Prototyp-Geschichten
 
-Beim Betreten und Verlassen eines Hauses wird die Spielwelt kurz ab- und wieder eingeblendet. Der Ortswechsel erfolgt in der Mitte des Übergangs; Bewegung und weitere Türaktionen sind währenddessen gesperrt. Mit „Weniger Bewegung“ wechselt die Ansicht sofort ohne Überblendung.
-
-Die drei Häuser im Weidendorf sind begehbar. An einer Haustür nach oben gehen oder die Interaktionstaste drücken; im Innenraum unten hinausgehen oder an der Tür interagieren. Jeder Raum enthält Möbel und zwei umhergehende Bewohner ohne Gespräche oder Aufgaben. Möbel und Wände begrenzen die Bewegung; Bewohner blockieren den Spieler nicht. Bei Pause, Gesprächen und „Weniger Bewegung“ ruhen die Animationen. Beim Neustart des Spiels steht der Spieler sicher vor dem zuletzt betretenen Haus; Questfortschritt bleibt erhalten.
-
-| Name | Rolle und bisherige Geschichte |
-| --- | --- |
-| Jona | Handwerker im Weidendorf; repariert mit drei Brettern die Brücke. |
-| Mina | Tüftlerin am Eingang der Flüsterhöhle; bittet um Hilfe für die Wassermaschine. |
-| Fuchs | Waldbewohner; tauscht sein Brett gegen einen Apfel. |
-| Hase | Hüpft während Q001 auf den Waldwegen; friedlicher Umgebungsbewohner. |
-| Weidendorf | Heimatort und Ausgangspunkt. |
-| Flüsterwald | Waldwege, Lichtungen und Fuchsbau. |
-| Flüsterhöhle | Zahnräder, Hinweisstein, Schalterkammer und Wassermaschine. |
-| Sonnensee | Nach Q002 erreichbar; Ausgangspunkt für kommende Geschichten. |
-
-## Offene Ideen
-
-Hier können kurze Ideen gesammelt werden, ohne sie schon als nächste Aufgabe festzulegen:
-
-- Noch keine weiteren Aufgaben festgelegt.
+Die ursprünglichen Aufgaben bleiben als Referenz archiviert: [Q001 – Die kaputte Brücke](quests/archive/Q001-die-kaputte-bruecke.md) und [Q002 – Die alte Wassermaschine](quests/archive/Q002-die-alte-wassermaschine.md). Sie gehören nicht zum aktuellen spielbaren Ablauf der neuen Reise. Bestehender Prototypcode und seine Tests bleiben als Referenz erhalten; die neue Route hat eigene Tests.

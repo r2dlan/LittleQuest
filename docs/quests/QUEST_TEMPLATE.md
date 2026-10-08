@@ -1,3 +1,7 @@
+# Frühere Quest-Vorlage
+
+Für die neue Reise bitte [STAGE_TEMPLATE.md](STAGE_TEMPLATE.md) und [TASK_TEMPLATE.md](TASK_TEMPLATE.md) verwenden. Diese Vorlage bleibt als Referenz für die alten Q-Quests erhalten.
+
 # QXXX – Titel der Aufgabe
 
 **Status:** Idee

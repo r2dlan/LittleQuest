@@ -6,6 +6,7 @@
 - Änderungen an Spiellogik, Steuerung oder Spielständen mit passenden bestehenden Tests prüfen und bei Bedarf sinnvolle Tests ergänzen.
 - Android-Builds über `npm run android:build` erstellen.
 - Story und Quests unter `docs/STORY.md` und `docs/quests/` aktuell halten.
+- Die aktive Reise besteht aus S01–S14 in `web/journey-world.js` und `web/journey-game.js`. Jede Stationsdatei erlaubt mehrere Aufgaben mit stabilen IDs wie `S03-A01`. Landschaftsstatus und Aufgabenstatus getrennt führen; geplante Aufgaben erst nach Implementierung als umgesetzt markieren. Die bisherigen Q001/Q002 sind unter `docs/quests/archive/` dokumentiert und gehören zum älteren Prototyp. Die neue Reise speichert separat unter `littlequest-journey-v1`; alte Spielstände nicht löschen.
 
 ## Git und Conventional Commits
 

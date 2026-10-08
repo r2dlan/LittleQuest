@@ -1,11 +1,22 @@
-const CACHE = "littlequest-v18";
+const CACHE = "littlequest-v38";
 const FILES = [
   "./",
   "./index.html",
   "./style.css",
   "./game.js",
+  "./journey-game.js",
+  "./journey-world.js",
   "./characters.js",
+  "./beach.js",
+  "./camels.js",
+  "./wildlife.js",
   "./assets/characters-b.png",
+  "./assets/characters-desert.png",
+  "./assets/characters-snow.png",
+  "./assets/characters-beach.png",
+  "./assets/brother-beach.png",
+  "./assets/camels.png",
+  "./assets/wildlife.png",
   "./quest.js",
   "./world.js",
   "./swipe.js",

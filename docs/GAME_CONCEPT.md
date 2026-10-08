@@ -1,5 +1,7 @@
 # Little Quest – Spielkonzept
 
+Historisches Konzept des ersten Prototyps. Der aktuelle rote Faden mit 14 Landschaftsstationen und der Suche nach dem Bruder steht in [STORY.md](STORY.md). Die Aufgaben dieses ursprünglichen Konzepts sind nicht der aktive Ablauf der neuen Landschaftsvorschau.
+
 ## Grundidee
 
 **Little Quest** ist ein kleines, leichtgewichtiges 2D-Abenteuerspiel für Android.
