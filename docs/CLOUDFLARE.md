@@ -1,5 +1,7 @@
 # Releases auf Cloudflare Pages
 
+Das Spiel ist unter [littlequest.daniel-andres.com](https://littlequest.daniel-andres.com) verfügbar. Die Domain gehört zum Pages-Projekt `littlequest`.
+
 Nach einem neuen GitHub-Release veröffentlicht der Workflow **Release Please** genau dessen Webversion auf Cloudflare Pages. Er wartet auf die gemeinsamen Android-/Container-Builds, die Package-Veröffentlichung und das Anhängen der Release-Downloads. Normale Pushes und Pull Requests veröffentlichen keine Pages-Version.
 
 ## Einmalig einrichten
@@ -30,6 +32,6 @@ Wrangler ist im Workflow auf eine feste Version gepinnt; Renovate aktualisiert d
 - Unter **Actions → Release Please → Run workflow** kann ein vorhandener `release-tag` erneut gebaut werden. Standardmäßig verändert das die Website nicht. Nur wenn **deploy-pages** aktiviert wird, veröffentlicht der Workflow den gewählten Release auch auf der Produktionsseite. Ein älterer Tag setzt die Website damit auf diese Version zurück.
 - Der gewählte Release muss das Vorbereitungsskript enthalten; ältere Tags vor dieser Einrichtung benötigen einen neuen Release.
 
-Nach der ersten Veröffentlichung kann die Pages-Adresse oder eine eigene Domain als direkter Spiel-Link in die Haupt-README aufgenommen werden. Für die öffentliche Datenschutzseite müssen die Angaben zu Hosting und die tatsächliche URL abschließend ergänzt werden; siehe [Google-Play-Vorbereitung](store/PLAY_STORE.md).
+Die Haupt-README verlinkt die öffentliche Spieladresse. Für die öffentliche Datenschutzseite müssen die Angaben zu Hosting und die tatsächliche URL abschließend ergänzt werden; siehe [Google-Play-Vorbereitung](store/PLAY_STORE.md).
 
 Quellen: [Cloudflare: CI mit Direct Upload](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/), [automatische Git-Deployments deaktivieren](https://developers.cloudflare.com/pages/configuration/git-integration/).

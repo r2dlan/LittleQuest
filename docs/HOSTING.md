@@ -1,5 +1,7 @@
 # LittleQuest im Container betreiben
 
+Ohne eigenen Container kannst du [Little Quest direkt im Browser spielen](https://littlequest.daniel-andres.com). Die öffentliche Website läuft auf [Cloudflare Pages](CLOUDFLARE.md).
+
 ## Container herunterladen und starten
 
 GitHub-Releases und das Container-Package werden automatisch auf jeweils zehn Versionen begrenzt. Ältere Releases einschließlich ihrer Downloads und ältere Container-Versionen werden gelöscht; `latest` bleibt geschützt. Git-Tags bleiben erhalten. Details und die manuelle Vorschau stehen in [docs/RELEASES.md](RELEASES.md).

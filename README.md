@@ -2,6 +2,10 @@
 
 Ein gemütliches 2D-Abenteuer in Draufsicht für Spieler ab 6 Jahren. Erkunde das Dorf und den Wald, hilf beim Reparieren einer Brücke und entdecke das Geheimnis der alten Wassermaschine.
 
+## Im Browser spielen
+
+[Little Quest direkt spielen](https://littlequest.daniel-andres.com) – auf dem Smartphone oder Computer, ohne Installation.
+
 ## Auf Android spielen
 
 Lade **LittleQuest.apk** aus dem [aktuellen Release](https://github.com/r2dlan/LittleQuest/releases/latest) herunter und öffne die Datei auf deinem Smartphone. Falls Android nachfragt, erlaube die Installation aus dieser Quelle. Benötigt wird Android 8.0 oder neuer.
