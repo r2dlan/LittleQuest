@@ -1,4 +1,30 @@
 export const WORLD = { width: 3200, height: 1056 };
+const rabbitTrail = [
+  [300, 540],
+  [480, 540],
+  [480, 230],
+  [480, 540],
+  [700, 540],
+  [300, 540],
+];
+export function rabbitPose(seconds) {
+  const phase = (seconds % 0.8) / 0.8;
+  const flight = Math.min(phase / 0.75, 1);
+  let distance = (Math.floor(seconds / 0.8) * 24 + flight * 24) % 1420;
+  for (let i = 1; i < rabbitTrail.length; i++) {
+    const [x, y] = rabbitTrail[i - 1];
+    const [nextX, nextY] = rabbitTrail[i];
+    const length = Math.hypot(nextX - x, nextY - y);
+    if (distance <= length)
+      return {
+        x: x + ((nextX - x) * distance) / length,
+        y: y + ((nextY - y) * distance) / length,
+        facing: nextX < x ? -1 : 1,
+        lift: Math.sin(flight * Math.PI) * 8,
+      };
+    distance -= length;
+  }
+}
 export const places = {
   jona: { x: 1270, y: 540 },
   fox: { x: 190, y: 315 },
@@ -27,6 +53,28 @@ export const houses = [
   { x: 1400, y: 280, w: 165, h: 125 },
   { x: 1130, y: 725, w: 165, h: 135 },
 ];
+export const roomFurniture = [
+  { x: 100, y: 110, w: 100, h: 62, kind: "bed" },
+  { x: 275, y: 190, w: 90, h: 60, kind: "table" },
+  { x: 420, y: 105, w: 110, h: 45, kind: "kitchen" },
+  { x: 100, y: 360, w: 60, h: 55, kind: "shelf" },
+];
+export function moveInRoom(p, dx, dy) {
+  const steps = Math.max(1, Math.ceil(Math.hypot(dx, dy) / 4));
+  const free = (x, y) =>
+    x >= 89 &&
+    x <= 551 &&
+    y >= 97 &&
+    y <= 443 &&
+    !roomFurniture.some(
+      (o) =>
+        x + 9 > o.x && x - 9 < o.x + o.w && y + 7 > o.y && y - 7 < o.y + o.h,
+    );
+  for (let i = 0; i < steps; i++) {
+    if (free(p.x + dx / steps, p.y)) p.x += dx / steps;
+    if (free(p.x, p.y + dy / steps)) p.y += dy / steps;
+  }
+}
 export const rocks = [
   { x: 555, y: 460, w: 90, h: 65 },
   { x: 330, y: 420, w: 70, h: 55 },

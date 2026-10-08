@@ -6,6 +6,7 @@
 - [Releases und Workflows](RELEASES.md): gemeinsame Builds, Signierung und Aufbewahrung.
 - [Abhängigkeiten mit Renovate](RENOVATE.md).
 - [Story und neue Quests](STORY.md).
+- [Figurengrafik](GRAPHICS.md): Stil B, Sprites und Erstellung.
 - [Spielkonzept](GAME_CONCEPT.md).
 - [Google-Play-Vorbereitung](store/PLAY_STORE.md) und [Signierung](store/SIGNING.md).
 

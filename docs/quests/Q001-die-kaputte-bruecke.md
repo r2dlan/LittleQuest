@@ -20,6 +20,8 @@ Jona, der Handwerker im Dorf, braucht drei Bretter zur Reparatur der Brücke. Di
 
 ## Gespräche und Hinweise
 
+Während der ersten Quest hüpft ein Hase über die Waldwege und zur nördlichen Lichtung. Er ist ein friedlicher Umgebungsbewohner, benötigt keine Interaktion und blockiert keine Wege. Bei Pause, Gesprächen und der Einstellung „Weniger Bewegung“ bleibt er stehen. Nach der Brückenreparatur endet sein Auftritt.
+
 Jona erklärt die Brettsuche und erwähnt den Fuchs. Bei erneuter Nachfrage nennt er den aktuellen Fortschritt und den Apfel als Hinweis. Der Fuchs reagiert auf den mitgebrachten Apfel; nach dem Tausch knuspert er zufrieden.
 
 ## Dauerhafte Veränderung

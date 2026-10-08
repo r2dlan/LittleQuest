@@ -38,11 +38,18 @@ Du kannst auch einfach im Chat eine Geschichte erzählen. Daraus können wir ein
 
 ## Figuren und Orte
 
+Die menschlichen Figuren verwenden den ausgewählten Stil B: detaillierte Pixelgrafik mit großen ausdrucksstarken Gesichtern, Lichtdetails und erdigen Kleidungsfarben. Die Spielfigur trägt einen roten Rucksack, Jona eine Handwerkerschürze und einen grauen Bart, Mina einen Haarknoten. Hausbewohner nutzen passende Varianten. Die transparenten Sprites in `web/assets/characters-b.png` wurden mit Imagegen direkt aus der freigegebenen B-Vorlage erstellt: drei Figuren mit Vorder-, Seiten- und Rückansichten. `web/characters.js` zeichnet die passenden Ausschnitte; links wird die Seitenansicht gespiegelt. Beim Laufen bewegen sich die Füße abwechselnd, bei „Weniger Bewegung“ bleiben die Figuren ruhig. Das Bild wird für Offline-Spiel und Android mitgeliefert.
+
+Beim Betreten und Verlassen eines Hauses wird die Spielwelt kurz ab- und wieder eingeblendet. Der Ortswechsel erfolgt in der Mitte des Übergangs; Bewegung und weitere Türaktionen sind währenddessen gesperrt. Mit „Weniger Bewegung“ wechselt die Ansicht sofort ohne Überblendung.
+
+Die drei Häuser im Weidendorf sind begehbar. An einer Haustür nach oben gehen oder die Interaktionstaste drücken; im Innenraum unten hinausgehen oder an der Tür interagieren. Jeder Raum enthält Möbel und zwei umhergehende Bewohner ohne Gespräche oder Aufgaben. Möbel und Wände begrenzen die Bewegung; Bewohner blockieren den Spieler nicht. Bei Pause, Gesprächen und „Weniger Bewegung“ ruhen die Animationen. Beim Neustart des Spiels steht der Spieler sicher vor dem zuletzt betretenen Haus; Questfortschritt bleibt erhalten.
+
 | Name | Rolle und bisherige Geschichte |
 | --- | --- |
 | Jona | Handwerker im Weidendorf; repariert mit drei Brettern die Brücke. |
 | Mina | Tüftlerin am Eingang der Flüsterhöhle; bittet um Hilfe für die Wassermaschine. |
 | Fuchs | Waldbewohner; tauscht sein Brett gegen einen Apfel. |
+| Hase | Hüpft während Q001 auf den Waldwegen; friedlicher Umgebungsbewohner. |
 | Weidendorf | Heimatort und Ausgangspunkt. |
 | Flüsterwald | Waldwege, Lichtungen und Fuchsbau. |
 | Flüsterhöhle | Zahnräder, Hinweisstein, Schalterkammer und Wassermaschine. |

@@ -42,10 +42,19 @@ test("Container server accepts network binding and serves offline game files", a
   const page = await fetch(base);
   assert.equal(page.status, 200);
   assert.match(await page.text(), /game\.js/);
-  for (const file of ["game.js", "settings.js", "sw.js", "privacy.html"]) {
+  for (const file of [
+    "game.js",
+    "characters.js",
+    "settings.js",
+    "sw.js",
+    "privacy.html",
+  ]) {
     assert.equal((await fetch(`${base}/${file}`)).status, 200, file);
   }
   const privacy = await fetch(`${base}/privacy-details.json`);
+  const sprites = await fetch(`${base}/assets/characters-b.png`);
+  assert.equal(sprites.status, 200);
+  assert.equal(sprites.headers.get("content-type"), "image/png");
   assert.equal(privacy.headers.get("content-type"), "application/json");
   assert.equal((await privacy.json()).publisher, "Daniel Andres");
   assert.equal((await fetch(`${base}/missing.html`)).status, 404);

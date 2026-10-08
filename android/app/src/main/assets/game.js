@@ -1,3 +1,4 @@
+import { drawCharacter } from "./characters.js";
 import {
   collectBoard,
   collectGear,
@@ -16,9 +17,12 @@ import {
   gears,
   houses,
   move,
+  moveInRoom,
   nearby,
   places,
+  rabbitPose,
   rocks,
+  roomFurniture,
   spawn,
   switches,
   trees,
@@ -59,19 +63,68 @@ const keys = new Set(),
   pointers = new Map();
 let swipe = null,
   swipeVector = { x: 0, y: 0 };
+let interior = null;
+let sceneTransition = null;
+function changeScene(action) {
+  if (sceneTransition) return;
+  clearInput();
+  p.walking = false;
+  $("prompt").textContent = "";
+  if (settings.reducedMotion) action();
+  else sceneTransition = { elapsed: 0, action, switched: false };
+}
+function doorway() {
+  return houses.findIndex(
+    (h) =>
+      Math.abs(p.x - (h.x + h.w / 2)) < 24 &&
+      p.y >= h.y + h.h &&
+      p.y <= h.y + h.h + 38,
+  );
+}
+function enterHouse(index) {
+  changeScene(() => {
+    const house = houses[index];
+    interior = { index, x: house.x + house.w / 2, y: house.y + house.h + 25 };
+    Object.assign(p, { x: 320, y: 420, face: "up", walking: false });
+    clearInput();
+    hud();
+    save();
+  });
+}
+function leaveHouse() {
+  changeScene(() => {
+    Object.assign(p, {
+      x: interior.x,
+      y: interior.y,
+      face: "down",
+      walking: false,
+    });
+    interior = null;
+    clearInput();
+    hud();
+    save();
+  });
+}
 function resize() {
   const zoom = Math.max(1.15, Math.min(innerWidth / 640, innerHeight / 390));
-  W = Math.round(innerWidth / zoom);
-  H = Math.round(innerHeight / zoom);
-  canvas.width = W;
-  canvas.height = H;
+  // Every world pixel occupies whole screen pixels, avoiding soft edges.
+  const density = Math.max(1, Math.min(globalThis.devicePixelRatio || 1, 3));
+  const pixelScale = Math.max(1, Math.round(zoom * density));
+  const viewScale = 0.8;
+  W = Math.ceil((innerWidth * density) / (pixelScale * viewScale));
+  H = Math.ceil((innerHeight * density) / (pixelScale * viewScale));
+  canvas.width = W * pixelScale;
+  canvas.height = H * pixelScale;
+  canvas.style.width = `${(canvas.width / density) * viewScale}px`;
+  canvas.style.height = `${(canvas.height / density) * viewScale}px`;
+  ctx.setTransform(pixelScale, 0, 0, pixelScale, 0, 0);
   ctx.imageSmoothingEnabled = false;
 }
 addEventListener("resize", resize);
 resize();
 function save() {
-  s.x = p.x;
-  s.y = p.y;
+  s.x = interior?.x ?? p.x;
+  s.y = interior?.y ?? p.y;
   s.viewVersion = 2;
   try {
     localStorage.setItem("littlequest-v1", JSON.stringify(s));
@@ -93,8 +146,9 @@ function hud() {
     : s.apple
       ? "🍎 1"
       : "";
-  $("area").textContent =
-    p.x < 900
+  $("area").textContent = interior
+    ? ["WOHNHAUS", "DORFKÜCHE", "GÄSTEHAUS"][interior.index]
+    : p.x < 900
       ? "FLÜSTERWALD"
       : p.x < 1830
         ? "WEIDENDORF"
@@ -123,9 +177,12 @@ function say(speaker, title, text, label = "Weiter", action = () => {}) {
   $("dialogNext").textContent = label;
   $("dialog").hidden = false;
   dialogAction = action;
+  $("dialogNext").focus();
 }
 $("dialogNext").onclick = () => {
   $("dialog").hidden = true;
+  canvas.tabIndex = -1;
+  canvas.focus({ preventScroll: true });
   const f = dialogAction;
   dialogAction = null;
   f?.();
@@ -133,6 +190,7 @@ $("dialogNext").onclick = () => {
   save();
 };
 function target() {
+  if (interior) return null;
   if (s.repaired) {
     if (nearby(p, places.mina)) return "mina";
     if (s.caveAccepted && nearby(p, places.clue)) return "clue";
@@ -147,7 +205,16 @@ function target() {
   return null;
 }
 function interact() {
-  if (paused || !$("dialog").hidden) return;
+  if (sceneTransition || paused || !$("dialog").hidden) return;
+  if (interior) {
+    if (Math.abs(p.x - 320) < 35 && p.y > 395) leaveHouse();
+    return;
+  }
+  const houseIndex = doorway();
+  if (houseIndex >= 0) {
+    enterHouse(houseIndex);
+    return;
+  }
   const t = target();
   if (caveInteract(t)) return;
   if (t === "jona") {
@@ -310,6 +377,7 @@ function caveInteract(t) {
   return false;
 }
 function down(k) {
+  if (sceneTransition) return;
   if (keys.has(k)) return;
   keys.add(k);
   if (k === "interact") interact();
@@ -391,6 +459,8 @@ $("play").onclick = () => {
 };
 $("reset").onclick = () => {
   if (!confirm("Gespeicherten Fortschritt löschen und neu beginnen?")) return;
+  interior = null;
+  sceneTransition = null;
   s = freshState();
   Object.assign(p, spawn(s));
   $("play").textContent = "Abenteuer beginnen";
@@ -461,9 +531,21 @@ document.addEventListener("visibilitychange", () => {
 addEventListener("pagehide", save);
 function update(dt) {
   time += dt;
-  if (!settings.reducedMotion) animationTime += dt;
+  if (sceneTransition) {
+    sceneTransition.elapsed += dt;
+    if (!sceneTransition.switched && sceneTransition.elapsed >= 0.24) {
+      sceneTransition.switched = true;
+      sceneTransition.action();
+    }
+    if (sceneTransition.elapsed >= 0.48) {
+      sceneTransition = null;
+      clearInput();
+    }
+    return;
+  }
   if (time > toastUntil) $("toast").classList.remove("visible");
   if (paused || !$("dialog").hidden) return;
+  if (!settings.reducedMotion) animationTime += dt;
   let dx = (keys.has("right") ? 1 : 0) - (keys.has("left") ? 1 : 0),
     dy = (keys.has("down") ? 1 : 0) - (keys.has("up") ? 1 : 0);
   if (!dx && !dy) {
@@ -474,6 +556,26 @@ function update(dt) {
   if (Math.abs(dy) > Math.abs(dx)) p.face = dy > 0 ? "down" : "up";
   else if (dx) p.face = dx > 0 ? "right" : "left";
   const length = Math.hypot(dx, dy) || 1;
+  if (interior) {
+    moveInRoom(p, (dx / length) * 125 * dt, (dy / length) * 125 * dt);
+    if (dy > 0 && Math.abs(p.x - 320) < 28 && p.y >= 438) leaveHouse();
+    else {
+      $("prompt").textContent =
+        p.y > 395 && Math.abs(p.x - 320) < 35
+          ? "↓ / E / ✋ · Haus verlassen"
+          : "";
+      saveTimer += dt;
+      if (saveTimer > 2) {
+        save();
+        saveTimer = 0;
+      }
+    }
+    return;
+  }
+  if (dy < 0 && doorway() >= 0) {
+    enterHouse(doorway());
+    return;
+  }
   move(p, (dx / length) * 125 * dt, (dy / length) * 125 * dt, s);
   for (const item of boards)
     if (nearby(p, item, 24) && collectBoard(s, item.id)) {
@@ -507,6 +609,7 @@ function update(dt) {
   }
   const t = target();
   $("prompt").textContent =
+    (doorway() >= 0 ? "↑ / E / ✋ · Haus betreten" : "") ||
     cavePrompt(t) ||
     (t === "jona"
       ? "E / ✋ · Mit Jona sprechen"
@@ -528,7 +631,7 @@ function update(dt) {
 }
 const rect = (x, y, w, h, c) => {
   ctx.fillStyle = c;
-  ctx.fillRect(Math.round(x), Math.round(y), w, h);
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 };
 function poly(points, c) {
   ctx.fillStyle = c;
@@ -643,42 +746,23 @@ function house(o) {
   rect(x + w - 53, y + h - 65, 19, 19, "#99c8b1");
   rect(x + w / 2 - 20, y + h, 40, 12, "#b6a583");
 }
-function person(x, y, npc = false, name = "") {
-  shadow(x, y + 3, 23);
-  const face = npc ? "down" : p.face,
-    bob = !npc && p.walking ? Math.sin(animationTime * 14) * 1 : 0;
-  ctx.save();
-  ctx.translate(Math.round(x), Math.round(y + bob));
-  if (face === "left") ctx.scale(-1, 1);
-  const side = face === "left" || face === "right";
-  const step = !npc && p.walking ? Math.sin(animationTime * 14) * 2 : 0;
-  rect(-7, -4, 6, 8 + step, "#354b4b");
-  rect(2, -4, 6, 8 - step, "#354b4b");
-  rect(-8, 4 + step, 8, 3, "#493d2c");
-  rect(2, 4 - step, 8, 3, "#493d2c");
-  if (!npc) {
-    rect(-9, -15, 18, 9, "#b95845");
-    rect(-11, -13, 5, 12, "#d57349");
-  }
-  rect(-8, -20, 16, 15, npc ? "#73938b" : "#eee2b6");
-  rect(-11, -18, 4, 10, "#e4b17a");
-  rect(8, -18, 4, 10, "#e4b17a");
-  rect(-7, -33, 16, 15, "#eec08b");
-  rect(-10, -38, 20, 10, npc ? "#8b8170" : "#654731");
-  rect(-10, -30, 4, 12, npc ? "#8b8170" : "#654731");
-  rect(-6, -41, 14, 5, npc ? "#aa9873" : "#805839");
-  if (face === "up") {
-    rect(-7, -29, 16, 9, npc ? "#8b8170" : "#654731");
-  } else if (side) {
-    rect(7, -28, 3, 3, "#243c35");
-    rect(9, -25, 4, 4, "#eec08b");
-  } else {
-    rect(-3, -28, 2, 3, "#243c35");
-    rect(5, -28, 2, 3, "#243c35");
-  }
-  ctx.restore();
-  if (name) label(x, y - 49, name);
+function person(x, y, npc = false, name = "", resident = null) {
+  drawCharacter(ctx, {
+    x,
+    y,
+    face: resident?.face ?? (npc ? "down" : p.face),
+    role:
+      name === "JONA"
+        ? "jona"
+        : name === "MINA"
+          ? "mina"
+          : (resident?.role ?? (npc ? "mina" : "hero")),
+    walking: resident ? !settings.reducedMotion : !npc && p.walking,
+    time: animationTime,
+  });
+  if (name) label(x, y - 66, name);
 }
+
 function fox() {
   const { x, y } = places.fox;
   const xx = s.foxFed ? x + 36 : x;
@@ -706,12 +790,36 @@ function fox() {
   );
   rect(xx - 35, y - 17, 8, 6, "#f1dfb1");
 }
+function rabbit(pose) {
+  const { x, y, facing, lift } = pose;
+  shadow(x, y + 3, 20);
+  ctx.save();
+  ctx.translate(Math.round(x), Math.round(y - lift));
+  ctx.scale(facing, 1);
+  rect(-10, -11, 18, 12, "#615548");
+  rect(-9, -12, 16, 11, "#c5b79b");
+  rect(-7, -12, 11, 3, "#e5dbc0");
+  rect(-12, -8, 5, 5, "#f4edda");
+  rect(-6, -1, 7, 3, "#8c7961");
+  rect(5, -14, 10, 10, "#615548");
+  rect(6, -14, 8, 8, "#e5dbc0");
+  rect(6, -25, 3, 12, "#c5b79b");
+  rect(11, -26, 3, 13, "#e5dbc0");
+  rect(7, -23, 1, 7, "#c38e86");
+  rect(12, -24, 1, 8, "#c38e86");
+  rect(11, -12, 2, 2, "#273c32");
+  rect(14, -9, 2, 2, "#c38e86");
+  ctx.restore();
+}
 function board(x, y) {
   shadow(x, y + 4, 22);
+  rect(x - 15, y - 7, 30, 13, "#533d2b");
   rect(x - 14, y - 5, 28, 10, "#936138");
   rect(x - 13, y - 6, 26, 7, "#e0b36a");
   rect(x - 9, y - 4, 19, 1, "#f4ce89");
   rect(x + 8, y - 3, 2, 3, "#95663f");
+  rect(x - 11, y, 17, 1, "#a77943");
+  rect(x - 12, y - 5, 1, 8, "#f9d996");
 }
 function gear(x, y) {
   shadow(x, y + 5, 24);
@@ -720,9 +828,15 @@ function gear(x, y) {
   ctx.rotate(animationTime * 0.4);
   for (let i = 0; i < 8; i++) {
     ctx.rotate(Math.PI / 4);
+    rect(-4, -14, 8, 8, "#655330");
     rect(-3, -13, 6, 6, "#c5b478");
+    rect(-2, -13, 4, 1, "#fff0b3");
   }
+  rect(-9, -9, 18, 18, "#655330");
   rect(-8, -8, 16, 16, "#dad09c");
+  rect(-6, -7, 12, 2, "#fff0bf");
+  rect(-7, 5, 14, 2, "#a48b50");
+  rect(-4, -4, 8, 8, "#806737");
   rect(-3, -3, 6, 6, "#566d62");
   ctx.restore();
 }
@@ -763,7 +877,88 @@ function ground() {
   rect(2428, 222, 64, 320, "#59675e");
   rect(2630, 505, 570, 70, "#c5b47e");
 }
-function draw() {
+function drawInterior() {
+  rect(0, 0, W, H, "#203a35");
+  ctx.save();
+  const scale = Math.min(W / 640, H / 480) * 0.8;
+  ctx.translate((W - 640 * scale) / 2, (H - 480 * scale) / 2);
+  ctx.scale(scale, scale);
+  rect(70, 65, 500, 390, "#543f31");
+  rect(80, 90, 480, 360, "#b98a56");
+  for (let y = 90; y < 450; y += 24) {
+    rect(80, y, 480, 2, "#87653e");
+    for (let x = 100 + (y % 48 ? 70 : 0); x < 560; x += 140)
+      rect(x, y + 2, 1, 22, "#976f43");
+  }
+  rect(80, 65, 480, 25, "#e5cda0");
+  for (const x of [220, 380]) {
+    rect(x, 66, 40, 22, "#655438");
+    rect(x + 3, 68, 34, 16, "#a5cfbf");
+    rect(x + 19, 68, 2, 16, "#f3ddb5");
+  }
+  rect(230, 285, 180, 85, ["#966c65", "#668c7a", "#8a809e"][interior.index]);
+  rect(237, 292, 166, 71, "#d6be8c");
+  rect(290, 442, 60, 13, "#d9bc80");
+  label(320, 466, "↓ AUSGANG", "#f5dda2");
+  const objects = roomFurniture.map((f) => ({
+    y: f.y + f.h,
+    draw: () => {
+      rect(f.x - 2, f.y - 2, f.w + 4, f.h + 4, "#584332");
+      rect(f.x, f.y, f.w, f.h, "#ad7d4c");
+      if (f.kind === "bed") {
+        rect(f.x + 5, f.y + 5, f.w - 10, f.h - 10, "#768f86");
+        rect(f.x + 7, f.y + 7, 25, f.h - 14, "#f5e8c7");
+        rect(f.x + 36, f.y + 7, f.w - 43, 3, "#b1c5ad");
+      } else if (f.kind === "table") {
+        rect(f.x + 4, f.y + 4, f.w - 8, 4, "#e0b579");
+        rect(f.x + 18, f.y + 15, 22, 17, "#eee0b6");
+        rect(f.x + 50, f.y + 15, 12, 12, "#719b86");
+        rect(f.x + 53, f.y + 17, 6, 6, "#f2e1b9");
+      } else if (f.kind === "kitchen") {
+        rect(f.x + 4, f.y + 3, f.w - 8, 25, "#d9d1af");
+        rect(f.x + 12, f.y + 7, 28, 17, "#526b64");
+        rect(f.x + 63, f.y + 7, 18, 16, "#695448");
+        rect(f.x + 45, f.y + 30, 2, 12, "#705133");
+      } else {
+        for (let y = f.y + 4; y < f.y + f.h; y += 17) {
+          for (let i = 0; i < 5; i++)
+            rect(
+              f.x + 5 + i * 9,
+              y,
+              6,
+              12,
+              ["#698778", "#bf7159", "#d6b96d"][i % 3],
+            );
+        }
+      }
+    },
+  }));
+  for (let i = 0; i < 2; i++) {
+    const phase = (animationTime * 24 + interior.index * 37 + i * 105) % 320;
+    const x = 230 + (phase < 160 ? phase : 320 - phase);
+    const y = i ? 165 : 325;
+    objects.push({
+      y,
+      draw: () =>
+        person(x, y, true, "", {
+          face: phase < 160 ? "right" : "left",
+          role: i ? "jona" : "mina",
+        }),
+    });
+  }
+  objects.push({ y: p.y, draw: () => person(p.x, p.y) });
+  objects
+    .sort((a, b) => a.y - b.y)
+    .forEach((o) => {
+      o.draw();
+    });
+  ctx.restore();
+}
+function drawScene() {
+  if (interior) {
+    drawInterior();
+    return;
+  }
   cameraX = Math.max(0, Math.min(WORLD.width - W, p.x - W * 0.5));
   cameraY = Math.max(0, Math.min(WORLD.height - H, p.y - H * 0.54));
   ctx.fillStyle = "#759b60";
@@ -854,10 +1049,21 @@ function draw() {
   rect(170, 263, 29, 20, "#233c2f");
   rect(places.apple.x - 8, places.apple.y - 11, 16, 18, "#b57d47");
   if (s.accepted && !s.apple && !s.foxFed) {
+    rect(places.apple.x - 7, places.apple.y - 16, 14, 13, "#72392e");
     rect(places.apple.x - 6, places.apple.y - 15, 12, 11, "#d36344");
+    rect(places.apple.x - 4, places.apple.y - 14, 3, 3, "#ffb77e");
+    rect(places.apple.x - 1, places.apple.y - 19, 2, 5, "#634630");
     rect(places.apple.x, places.apple.y - 19, 5, 4, "#83a455");
   }
   const renderables = [
+    ...(!s.repaired
+      ? [
+          {
+            y: rabbitPose(animationTime).y,
+            draw: () => rabbit(rabbitPose(animationTime)),
+          },
+        ]
+      : []),
     ...trees.map((t) => ({ y: t.y, draw: () => tree(t) })),
     ...houses.map((o) => ({ y: o.y + o.h, draw: () => house(o) })),
     ...rocks.map((r) => ({ y: r.y + r.h, draw: () => rock(r) })),
@@ -866,14 +1072,14 @@ function draw() {
       draw: () => {
         person(places.jona.x, places.jona.y, true, "JONA");
         if (!s.repaired)
-          label(places.jona.x, places.jona.y - 61, s.accepted ? "…" : "!");
+          label(places.jona.x, places.jona.y - 78, s.accepted ? "…" : "!");
       },
     },
     {
       y: places.mina.y,
       draw: () => {
         person(places.mina.x, places.mina.y, true, "MINA");
-        if (!s.caveAccepted) label(places.mina.x, places.mina.y - 61, "!");
+        if (!s.caveAccepted) label(places.mina.x, places.mina.y - 78, "!");
       },
     },
     { y: places.fox.y, draw: fox },
@@ -942,6 +1148,16 @@ function draw() {
     rect(t.x - 30, t.y - 16, 60, 20, "#d9bd80");
     label(t.x, t.y - 3, t.text, "#445b3d");
   }
+  ctx.restore();
+}
+function draw() {
+  drawScene();
+  if (!sceneTransition) return;
+  const progress = Math.min(1, sceneTransition.elapsed / 0.48);
+  const opacity = 1 - Math.abs(progress * 2 - 1);
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  rect(0, 0, W, H, "#142e2a");
   ctx.restore();
 }
 function frame(now) {
