@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0](https://github.com/r2dlan/LittleQuest/compare/v0.5.2...v0.6.0) (2026-10-08)
+
+
+### Features
+
+* **game:** add village interiors and detailed character sprites ([3690bf7](https://github.com/r2dlan/LittleQuest/commit/3690bf78131f86c33e7f2e793771020493cc5436))
+
+
+### CI
+
+* **release:** improve release PR titles and merge messages ([1f102da](https://github.com/r2dlan/LittleQuest/commit/1f102da7bc6476570598dfe30ac2c380f38e4b20))
+
+
+### Maintenance
+
+* merge release 0.5.2 from main ([23a5254](https://github.com/r2dlan/LittleQuest/commit/23a5254d8b8d88b6de1c70e2b9aa8e2e80fb00e4))
+
 ## [0.5.2](https://github.com/r2dlan/LittleQuest/compare/v0.5.1...v0.5.2) (2026-10-08)
 
 
