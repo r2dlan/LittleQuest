@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/r2dlan/LittleQuest/compare/v0.6.0...v0.7.0) (2026-10-08)
+
+
+### Features
+
+* **game:** add fourteen-stage journey with regional scenery and wildlife ([cea6426](https://github.com/r2dlan/LittleQuest/commit/cea64262f20c63c772de30356f1f285144b85545))
+
+
+### Documentation
+
+* **game:** document artwork and update development guidance ([07bf9fd](https://github.com/r2dlan/LittleQuest/commit/07bf9fdc5d16f985dbf477dd60138389b2b83fcd))
+
 ## [0.6.0](https://github.com/r2dlan/LittleQuest/compare/v0.5.2...v0.6.0) (2026-10-08)
 
 
