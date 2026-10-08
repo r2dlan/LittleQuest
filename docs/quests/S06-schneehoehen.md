@@ -14,7 +14,7 @@ Auf den Gipfeln bleibt der erste Schnee liegen.
 
 Schneeflecken wachsen über den Übergang vom Bergpfad allmählich zu einer dichten Decke zusammen. Unregelmäßige Verwehungen, helle Oberseiten und bläuliche Schatten strukturieren den Schnee. Felsen und Tannen bekommen schrittweise Schneeauflagen; der Weg bleibt sichtbar. Beim Abstieg nimmt die Schneedecke entsprechend wieder ab.
 
-Der Weg führt durch Schneehöhen und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über. 
+Der Weg führt durch Schneehöhen und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über.
 
 ## Aufgabenübersicht
 

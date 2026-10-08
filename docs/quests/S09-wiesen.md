@@ -12,7 +12,7 @@ Blumen und Gras begleiten dich durch die Wiesen.
 
 ## Landschaft und Weg
 
-Der Weg führt durch Weite Wiesen und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über. 
+Der Weg führt durch Weite Wiesen und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über.
 
 Hasen, Füchse, Igel und Rehe sind über die grünen Reiseabschnitte S08, S09, S12 und S13 verteilt. Sie bewegen sich auf eigenen Routen neben dem Hauptweg, ohne Interaktion oder neue Aufgaben. Pausieren hält sie an; reduzierte Bewegung zeigt sie ohne Animation.
 

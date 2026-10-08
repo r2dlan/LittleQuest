@@ -2,6 +2,8 @@
 
 Stand: 6. Oktober 2026. Vorbereitung, noch keine Store-Einreichung.
 
+Die lokale Entwicklung verwendet inzwischen die 14-Stationen-Landschaftsvorschau der [neuen Reise](../STORY.md). Aufgaben sind noch nicht umgesetzt. Store-Texte und bisherige Screenshots zeigen den älteren Prototyp und müssen vor einer Einreichung mit dem finalen Spiel abgeglichen werden.
+
 ## Vorbereitet
 
 - Herausgeber: Daniel Andres; Kontakt: moin@daniel-andres.com.
@@ -28,7 +30,8 @@ Stand: 6. Oktober 2026. Vorbereitung, noch keine Store-Einreichung.
 
 | Test | Erwartung | Ergebnis |
 |---|---|---|
-| Beide Quests vollständig spielen | Gegenstände, Dialoge, Brücke, Maschine und See funktionieren | Offen |
+| Neue Reise in beide Richtungen erkunden | Alle 14 Stationen, Brücke, Aufstieg, Häuser und Strand erreichbar | Offen |
+| Spätere Aufgaben vollständig spielen | Erst nach Implementierung anhand der Stationsdateien prüfen | Noch nicht implementiert |
 | Während Bewegung Home drücken, App zurückholen | Stillstand, Pausenmenü, keine klemmende Steuerung | Offen |
 | Während eines Dialogs App wechseln | Dialog bleibt nach Fortsetzen nutzbar | Offen |
 | App schließen/Prozess beenden, neu öffnen | Zuletzt gespeicherter Fortschritt und Einstellungen wiederhergestellt | Offen |

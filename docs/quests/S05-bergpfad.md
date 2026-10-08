@@ -12,7 +12,7 @@ Fels und Gräser begleiten den offenen Weg über den Berg.
 
 ## Landschaft und Weg
 
-Der Weg führt durch Bergpfad und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über. 
+Der Weg führt durch Bergpfad und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über.
 
 ## Aufgabenübersicht
 

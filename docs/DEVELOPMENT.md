@@ -12,9 +12,11 @@ Dann http://127.0.0.1:4173 öffnen. Für das Spielen sind keine installierten np
 
 ## Aufbau
 
-- `web/game.js`: Darstellung, Eingaben und Dialoge.
-- `web/world.js`: Karte, Kollisionen und Startpositionen.
-- `web/quest.js`: Questlogik.
+- `web/journey-game.js`: aktiver Einstieg, Darstellung der Reise, Eingaben und Häuser.
+- `web/journey-world.js`: 14 Stationen, Landschaftsübergänge, Weg und Kollisionen.
+- `web/characters.js`, `web/assets/characters-b.png` und `web/assets/characters-desert.png`: Figuren im Stil B, eigene Bewohner für die Wüstenstadt. Erstellung und Prompts stehen in `docs/GRAPHICS.md`.
+- `docs/STORY.md` und `docs/quests/S*.md`: roter Faden und mehrere Aufgaben je Station; Aufgaben bisher Entwurf.
+- `web/game.js`, `web/world.js` und `web/quest.js`: frühere Prototypgeschichten als Referenz. `world.js` stellt außerdem die gemeinsame Innenraumgeometrie bereit.
 - `web/settings.js`: lokale Einstellungen.
 - `server.mjs`: Webserver für Browser und Container.
 - `android/`: Java-WebView-App mit denselben Spieldateien, ohne Internetberechtigung.

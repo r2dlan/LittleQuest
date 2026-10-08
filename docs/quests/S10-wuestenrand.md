@@ -12,7 +12,7 @@ Das Gras wird spärlicher, warme Sanddünen tauchen auf.
 
 ## Landschaft und Weg
 
-Der Weg führt durch Wüstenrand und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über. 
+Der Weg führt durch Wüstenrand und bleibt in der Vorschau in beide Richtungen offen. Die angrenzenden Boden- und Wegfarben sowie die Vegetation gehen allmählich ineinander über.
 
 ## Aufgabenübersicht
 
