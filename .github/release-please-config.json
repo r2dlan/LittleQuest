@@ -4,6 +4,8 @@
   "include-component-in-tag": false,
   "bump-minor-pre-major": true,
   "always-update": true,
+  "pull-request-title-pattern": "chore(release): release LittleQuest ${version}",
+  "pull-request-header": "Dieser PR bereitet den nächsten LittleQuest-Release vor. Beim Mergen den PR-Titel als Commit-Titel und die Release-Notizen als Beschreibung übernehmen; bevorzugt Squash and merge verwenden.",
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",

@@ -21,6 +21,19 @@ Ein eigener Bot-Token sorgt dafür, dass Änderungen von Release Please die PR-P
 
 Referenz: [Release Please Action](https://github.com/googleapis/release-please-action).
 
+## Aussagekräftige Release-Merge-Nachrichten
+
+Release Please setzt den PR-Titel auf `chore(release): release LittleQuest <Version>`, zum Beispiel `chore(release): release LittleQuest 0.6.0`. Dieser Titel soll auch die erste Zeile des Merge-Commits sein; die Release-Notizen bilden die Beschreibung. Agents übernehmen das nach Merge-Freigabe ausdrücklich. Bevorzugte Methode ist **Squash and merge**.
+
+Damit auch manuelle Merges den passenden Text automatisch vorschlagen, einmal in [Settings → General → Pull Requests](https://github.com/r2dlan/LittleQuest/settings) einstellen:
+
+- Unter **Allow squash merging** die Standardnachricht **Pull request title and description** auswählen.
+- Falls **Allow merge commits** verwendet wird, dort ebenfalls **Pull request title and description** auswählen.
+
+Diese Einstellungen gelten für alle PRs im Repository; die erlaubten Merge-Methoden bleiben unverändert. Ohne diese GitHub-Einstellung ändert der neue Release-PR-Titel allein die Standardnachricht eines normalen Merge-Commits nicht. Vor dem Bestätigen eines Merges Titel und Beschreibung prüfen. Bereits bestehende Commits bleiben unverändert.
+
+Quellen: [Release-Please-Titel konfigurieren](https://github.com/googleapis/release-please/blob/main/docs/customizing.md#pull-request-title), [GitHub-Merge-Nachrichten konfigurieren](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-merging-for-pull-requests).
+
 ## Container-Downloads
 
 Bei einem neuen Release baut der gemeinsame Workflow `check.yml` Android-App und Docker-Image aus exakt demselben Release-Tag. Nach Codeprüfungen und Spieltests startet die Pipeline den Container und prüft die Auslieferung der Spiel- und Datenschutzdateien. Das Image wird als `LittleQuest-container.tar.gz` exportiert und zusammen mit APK und AAB an das Release angehängt. Die Veröffentlichung der Downloads wartet auf beide Builds; bei einem Fehler den vorhandenen Release-Tag über den manuellen Release-Please-Lauf erneut bauen lassen.
