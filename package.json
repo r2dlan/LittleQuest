@@ -16,6 +16,6 @@
     "store:check": "node scripts/check-store.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14"
+    "@biomejs/biome": "2.5.15"
   }
 }
