@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/r2dlan/LittleQuest/compare/v0.7.0...v0.7.1) (2026-10-12)
+
+
+### Maintenance
+
+* **deps:** update dependency @biomejs/biome to v2.5.15 ([#16](https://github.com/r2dlan/LittleQuest/issues/16)) ([b561d02](https://github.com/r2dlan/LittleQuest/commit/b561d02f0ae90291c70f9a51ece6cb279286b6e0))
+
 ## [0.7.0](https://github.com/r2dlan/LittleQuest/compare/v0.6.0...v0.7.0) (2026-10-08)
 
 
