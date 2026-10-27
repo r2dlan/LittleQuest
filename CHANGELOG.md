@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.1](https://github.com/r2dlan/LittleQuest/compare/v0.7.0...v0.7.1) (2026-10-27)
+
+
+### Maintenance
+
+* **deps:** update dependency @biomejs/biome to v2.5.15 ([#16](https://github.com/r2dlan/LittleQuest/issues/16)) ([b561d02](https://github.com/r2dlan/LittleQuest/commit/b561d02f0ae90291c70f9a51ece6cb279286b6e0))
+* **deps:** update dependency wrangler to v4.150.0 ([#19](https://github.com/r2dlan/LittleQuest/issues/19)) ([5afaaed](https://github.com/r2dlan/LittleQuest/commit/5afaaed2b58c32c69ff24e9f99cce7a29a70cd85))
+* **deps:** update dependency wrangler to v4.151.2 ([#20](https://github.com/r2dlan/LittleQuest/issues/20)) ([b05034c](https://github.com/r2dlan/LittleQuest/commit/b05034c99908a5574930549a5c8543c3582174c7))
+* **deps:** update gradle to v8.14.6 ([#18](https://github.com/r2dlan/LittleQuest/issues/18)) ([85d979e](https://github.com/r2dlan/LittleQuest/commit/85d979ed47aea80fa65852ad33221cc87b4983ca))
+* **deps:** update plugin com.android.application to v8.13.2 ([#21](https://github.com/r2dlan/LittleQuest/issues/21)) ([ccbb41e](https://github.com/r2dlan/LittleQuest/commit/ccbb41e305b55ec24545f69e39c2066a590c64b2))
+
 ## [0.7.0](https://github.com/r2dlan/LittleQuest/compare/v0.6.0...v0.7.0) (2026-10-08)
 
 
