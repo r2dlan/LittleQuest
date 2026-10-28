@@ -80,13 +80,13 @@ jobs:
     name: Code quality and tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ inputs.ref || github.sha }}
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
-          node-version: "22"
+          node-version: "22.23.4"
           cache: npm
       - name: Resolve shared commit and project version
         id: metadata
@@ -113,18 +113,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ needs.check.outputs.revision }}
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
-          node-version: "22"
-      - uses: actions/setup-java@v5
+          node-version: "22.23.4"
+      - uses: actions/setup-java@v5.7.0
         with:
           distribution: temurin
-          java-version: "17"
-      - uses: android-actions/setup-android@v3
+          java-version: "17.0.21+9"
+      - uses: android-actions/setup-android@v3.2.2
         with:
           packages: platform-tools
       - name: Install Android SDK components
@@ -132,7 +132,7 @@ jobs:
       - name: Read Gradle version
         id: gradle
         run: echo "version=$(cat android/gradle-version.txt)" >> "$GITHUB_OUTPUT"
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@v6.4.1
         with:
           gradle-version: ${{ steps.gradle.outputs.version }}
       - name: Build installable debug APK
@@ -142,7 +142,7 @@ jobs:
       - name: Verify APK signature
         run: '"$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose dist/LittleQuest.apk'
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: ${{ needs.check.outputs.android-artifact }}
           path: |
@@ -155,24 +155,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ needs.check.outputs.revision }}
           persist-credentials: false
       - name: Enable multi-platform Docker image storage
-        uses: docker/setup-docker-action@v5
+        uses: docker/setup-docker-action@v5.6.0
         with:
           daemon-config: '{"features":{"containerd-snapshotter":true}}'
       - name: Enable ARM64 execution
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@v4.4.0
         with:
           platforms: arm64
       - name: Set up multi-platform builder
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v4.4.1
         with:
           driver: docker
       - name: Build both platforms from shared revision
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v7.4.0
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -209,7 +209,7 @@ jobs:
           mkdir -p dist
           docker save --output dist/LittleQuest-container.tar littlequest:local
           gzip dist/LittleQuest-container.tar
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: ${{ needs.check.outputs.container-artifact }}
           path: dist/LittleQuest-container.tar.gz
@@ -230,11 +230,11 @@ jobs:
       packages: write
     steps:
       - name: Enable multi-platform Docker image storage
-        uses: docker/setup-docker-action@v5
+        uses: docker/setup-docker-action@v5.6.0
         with:
           daemon-config: '{"features":{"containerd-snapshotter":true}}'
-      - uses: docker/setup-buildx-action@v4
-      - uses: actions/download-artifact@v4
+      - uses: docker/setup-buildx-action@v4.4.1
+      - uses: actions/download-artifact@v4.3.0
         with:
           name: ${{ needs.check.outputs.container-artifact }}
           path: dist
